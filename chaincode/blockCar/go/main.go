@@ -27,7 +27,7 @@ func (t *BlockCarCC) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.lockCar(stub, args)
 	} else if fn == "getHistoryForCar" {
 		return t.getHistoryForCar(stub, args)
-	} else if fn == "deleteAirCd" {
+	} else if fn == "deleteCar" {
 		return t.deleteCar(stub, args)
 	}
 	return shim.Error("没有相应的方法！")
