@@ -6,6 +6,7 @@ type Car struct {
 	Commander  string     `json:"commander"` // 命令执行者
 	Info       Infomation `json:"info"`      // 基本信息
 	Sensor     Sensor     `json:"sensor"`    // 传感器
+	Owner      string     `json:"owner"`     // 所有人
 }
 
 type Sensor struct {
@@ -19,6 +20,5 @@ type Infomation struct {
 	ObjectType string `json:"objectType"`
 	ID         string `json:infoID` // 车辆信息id
 	Name       string `json:"name"`
-	Owner      string `json:"owner"`     // 所有人
 	CarNumber  string `json:"carNumber"` // 车牌号
 }

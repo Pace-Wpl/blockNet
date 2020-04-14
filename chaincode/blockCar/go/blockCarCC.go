@@ -40,9 +40,9 @@ func (t *BlockCarCC) initCar(stub shim.ChaincodeStubInterface, args []string) pe
 	commander := args[5]
 	objectType := "car"
 	sensor := &def.Sensor{ObjectType: "sensor", Velocity: 0.0, Temperature: 28.0, FaultCode: "null"}
-	info := &def.Infomation{ObjectType: "carInfo", ID: infoId, Name: name, Owner: owner, CarNumber: carNum}
+	info := &def.Infomation{ObjectType: "carInfo", ID: infoId, Name: name, CarNumber: carNum}
 
-	car := &def.Car{objectType, lock, commander, *info, *sensor}
+	car := &def.Car{objectType, lock, commander, *info, *sensor, owner}
 
 	carJsonAsBytes, err := json.Marshal(car)
 
@@ -133,7 +133,7 @@ func (t *BlockCarCC) lockCar(stub shim.ChaincodeStubInterface, args []string) pe
 	commander := args[2]
 
 	carStu := def.Car{}
-	err = json.Unmarshal(carStuAsBytes, carStu)
+	err = json.Unmarshal(carStuAsBytes, &carStu)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
