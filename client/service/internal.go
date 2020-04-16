@@ -8,6 +8,7 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 )
 
+//用eventID注册链码事件
 func regitserEvent(client *ch.Client, chaincodeID, eventID string) (fab.Registration, <-chan *fab.CCEvent) {
 
 	reg, notifier, err := client.RegisterChaincodeEvent(chaincodeID, eventID)
@@ -17,6 +18,7 @@ func regitserEvent(client *ch.Client, chaincodeID, eventID string) (fab.Registra
 	return reg, notifier
 }
 
+//用eventID接受链码事件结果
 func eventResult(notifier <-chan *fab.CCEvent, eventID string) error {
 	select {
 	case ccEvent := <-notifier:

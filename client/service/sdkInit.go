@@ -1,4 +1,4 @@
-package sdkinit
+package service
 
 import (
 	"fmt"
@@ -9,6 +9,33 @@ import (
 
 	"github.com/blockNet/client/def"
 )
+
+type ServiceSetup struct {
+	ChaincodeID string
+	Client      *channel.Client
+}
+
+var ServiceClient ServiceSetup
+
+func init() {
+	sdk, err := setupSDK(def.CONFIG_FILE, def.INITIALIZED)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer sdk.Close()
+
+	info := &def.InitInfo{ChannelID: def.CHAINNEL_ID, UserName: def.USER_NAME, OrgName: def.ORG_NAME}
+
+	channelClient, err := getChannelClient(sdk, info)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	ServiceClient = ServiceSetup{
+		ChaincodeID: def.CHAINCODE_ID,
+		Client:      channelClient,
+	}
+}
 
 //setupSdk
 func setupSDK(ConfigFile string, initialized bool) (*fabsdk.FabricSDK, error) {
