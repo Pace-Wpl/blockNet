@@ -222,7 +222,7 @@ channels:
 # list of participating organizations in this network
 #
 organizations:
-  Org1:
+  org1:
     mspid: Org1MSP
     cryptoPath: peerOrganizations/org1.blockNet.com/users/{userName}@org1.blockNet.com/msp
     peers:
@@ -231,8 +231,14 @@ organizations:
 
     users:
       User1:
+        cert: 
+          path: ../crypto-config/peerOrganizations/org1.blockNet.com/users/User1@org1.blockNet.com/msp/signcerts/cert.pem
+        
+
+      Admin:
         cert:
-          pem: ../crypto-config/peerOrganizations/org1.blockNet.com/users/User1@org1.blockNet.com/msp/signcerts/cert.pem
+          path: ../crypto-config/peerOrganizations/org1.blockNet.com/users/Admin@org1.blockNet.com/msp/signcerts/cert.pem
+              
 
     # [Optional]. Certificate Authorities issue certificates for identification purposes in a Fabric based
     # network. Typically certificates provisioning is done in a separate process outside of the
@@ -240,27 +246,51 @@ organizations:
     # dynamic certificate management (enroll, revoke, re-enroll). The following section is only for
     # Fabric-CA servers.
     certificateAuthorities:
-      - ca-org1
+      - ca_org1
 
-  Org2:
+  org2:
     mspid: Org2MSP
     cryptoPath: peerOrganizations/org2.blockNet.com/users/{userName}@org2.blockNet.com/msp
     peers:
       - peer0.org2.blockNet.com
       - peer1.org2.blockNet.com
 
+    users:
+      User1:
+        cert: 
+          path: ../crypto-config/peerOrganizations/org2.blockNet.com/users/User1@org2.blockNet.com/msp/signcerts/cert.pem
+        
+          
+      Admin:
+        cert:
+          path: ../crypto-config/peerOrganizations/org2.blockNet.com/users/Admin@org2.blockNet.com/msp/signcerts/cert.pem
+
     # [Optional]. Certificate Authorities issue certificates for identification purposes in a Fabric based
     # network. Typically certificates provisioning is done in a separate process outside of the
     # runtime network. Fabric-CA is a special certificate authority that provides a REST APIs for
     # dynamic certificate management (enroll, revoke, re-enroll). The following section is only for
     # Fabric-CA servers.
     certificateAuthorities:
-      - ca-org2
+      - ca_org2
 
   ordererorg:
-    mspID: OrdererMSP
-
+    mspid: OrdererMSP
     cryptoPath: ordererOrganizations/blockNet.com/users/{userName}@blockNet.com/msp
+    orderers:
+      - orderer1.blockNet.com
+      - orderer2.blockNet.com
+      - orderer3.blockNet.com
+      - orderer4.blockNet.com
+
+
+    users:
+      Admin:
+        cert:
+          path: ../crypto-config/ordererOrganization/blockNet.com/users/Admin@blockNet.com/msp/signcerts/cert.pem
+
+    certificateAuthorities:
+      - ca_orderer
+
 
 #
 # List of orderers to send transaction and channel create/update requests to. For the time

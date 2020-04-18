@@ -18,7 +18,7 @@ type ServiceSetup struct {
 var ServiceClient ServiceSetup
 
 func init() {
-	sdk, err := setupSDK(def.CONFIG_FILE, def.INITIALIZED)
+	sdk, err := SetupSDK(def.CONFIG_FILE, def.INITIALIZED)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -26,7 +26,7 @@ func init() {
 
 	info := &def.InitInfo{ChannelID: def.CHAINNEL_ID, UserName: def.USER_NAME, OrgName: def.ORG_NAME}
 
-	channelClient, err := getChannelClient(sdk, info)
+	channelClient, err := GetChannelClient(sdk, info)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -38,7 +38,7 @@ func init() {
 }
 
 //setupSdk
-func setupSDK(ConfigFile string, initialized bool) (*fabsdk.FabricSDK, error) {
+func SetupSDK(ConfigFile string, initialized bool) (*fabsdk.FabricSDK, error) {
 
 	if initialized {
 		return nil, fmt.Errorf("Fabric SDK已被实例化")
@@ -54,9 +54,11 @@ func setupSDK(ConfigFile string, initialized bool) (*fabsdk.FabricSDK, error) {
 }
 
 //获取通道客户端
-func getChannelClient(sdk *fabsdk.FabricSDK, info *def.InitInfo) (*channel.Client, error) {
+func GetChannelClient(sdk *fabsdk.FabricSDK, info *def.InitInfo) (*channel.Client, error) {
 
 	clientChannelContext := sdk.ChannelContext(info.ChannelID, fabsdk.WithUser(info.UserName), fabsdk.WithOrg(info.OrgName))
+	// fmt.Println([]byte(clientChannelContext))
+	fmt.Println(info.ChannelID)
 	// returns a Client instance. Channel client can query chaincode, execute chaincode and register/unregister for chaincode events on specific channel.
 	channelClient, err := channel.New(clientChannelContext)
 	if err != nil {

@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	CONFIG_FILE  = "./config.yaml"
+	CONFIG_FILE  = "/home/pace/go/src/github.com/blockNet/client/config.yaml"
 	INITIALIZED  = false
 	CHAINCODE_ID = "mycc"
 	USER_NAME    = "User1"
