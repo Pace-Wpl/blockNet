@@ -246,7 +246,7 @@ organizations:
     # dynamic certificate management (enroll, revoke, re-enroll). The following section is only for
     # Fabric-CA servers.
     certificateAuthorities:
-      - ca_org1
+      - ca-org1
 
   org2:
     mspid: Org2MSP
@@ -271,7 +271,7 @@ organizations:
     # dynamic certificate management (enroll, revoke, re-enroll). The following section is only for
     # Fabric-CA servers.
     certificateAuthorities:
-      - ca_org2
+      - ca-org2
 
   ordererorg:
     mspid: OrdererMSP
@@ -286,10 +286,10 @@ organizations:
     users:
       Admin:
         cert:
-          path: ../crypto-config/ordererOrganization/blockNet.com/users/Admin@blockNet.com/msp/signcerts/cert.pem
+          path: ../crypto-config/orderOrganization/blockNet.com/users/Admin@blockNet.com/msp/signcerts/cert.pem
 
     certificateAuthorities:
-      - ca_orderer
+      - ca-orderer
 
 
 #
@@ -320,7 +320,7 @@ orderers:
       path: ../crypto-config/orderOrganization/blockNet.com/orderers/orderer1.blockNet.com/msp/tlscacerts/tlsca.blockNet.com-cert.pem
 
   orderer2.blockNet.com:
-    url: localhost:8050
+    url: localhost:7050:8050
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
@@ -362,7 +362,7 @@ orderers:
       path: ../crypto-config/orderOrganization/blockNet.com/orderers/orderer3.blockNet.com/msp/tlscacerts/tlsca.blockNet.com-cert.pem
 
   orderer4.blockNet.com:
-    url: localhost:10050
+    url: localhost:1050
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
@@ -391,7 +391,7 @@ peers:
     # this URL is used to send endorsement and query requests
     url: localhost:7051
     # eventUrl is only needed when using eventhub (default is delivery service)
-    # eventUrl: peer0.org1.blockNet.com:7053
+    eventUrl: localhost:7053
 
     grpcOptions:
       ssl-target-name-override: peer0.org1.blockNet.com
@@ -413,7 +413,7 @@ peers:
     # this URL is used to send endorsement and query requests
     url: localhost:8051
     # eventUrl is only needed when using eventhub (default is delivery service)
-    # eventUrl: peer1.org1.blockNet.com:8053
+    eventUrl: localhost:8053
 
     grpcOptions:
       ssl-target-name-override: peer1.org1.blockNet.com
@@ -435,7 +435,7 @@ peers:
     # this URL is used to send endorsement and query requests
     url: localhost:9051
     # eventUrl is only needed when using eventhub (default is delivery service)
-    # eventUrl: peer1.org1.blockNet.com:9053
+    eventUrl: localhost:9053
 
     grpcOptions:
       ssl-target-name-override: peer0.org2.blockNet.com
@@ -457,7 +457,7 @@ peers:
     # this URL is used to send endorsement and query requests
     url: localhost:10051
     # eventUrl is only needed when using eventhub (default is delivery service)
-    # eventUrl: peer1.org1.blockNet.com:10053
+    eventUrl: localhost:10053
 
     grpcOptions:
       ssl-target-name-override: peer1.org2.blockNet.com
@@ -482,7 +482,7 @@ peers:
 #
 certificateAuthorities:
   ca-org1:
-    url: http://localhost:7054
+    url: http://ca-org1:7054
     tlsCACerts:
       # Certificate location absolute path
       path: ../crypto-config/peerOrganizations/org1.blockNet.com/tlsca/tlsca.org1.blockNet.com-cert.pem
@@ -496,7 +496,7 @@ certificateAuthorities:
     caName: ca-org1
 
   ca-org2:
-    url: http://localhost:8054
+    url: http://ca-org2:8054
     tlsCACerts:
       # Certificate location absolute path
       path: ../crypto-config/peerOrganizations/org2.blockNet.com/tlsca/tlsca.org2.blockNet.com-cert.pem
@@ -509,19 +509,19 @@ certificateAuthorities:
     # [Optional] The optional name of the CA.
     caName: ca-org2
 
-  # ca-orderer:
-  #   url: http://ca-orderer:9054
-  #   tlsCACerts:
-  #     # Certificate location absolute path
-  #     path: ../crypto-config/orderOrganization/blockNet.com/msp/tlscacerts/tlsca.blockNet.com-cert.pem
+  ca-orderer:
+    url: http://ca-orderer:9054
+    tlsCACerts:
+      # Certificate location absolute path
+      path: ../crypto-config/orderOrganization/blockNet.com/msp/tlscacerts/tlsca.blockNet.com-cert.pem
 
-  #   # Fabric-CA supports dynamic user enrollment via REST APIs. A "root" user, a.k.a registrar, is
-  #   # needed to enroll and invoke new users.
-  #   registrar:
-  #     enrollId: admin
-  #     enrollSecret: adminpw
-  #   # [Optional] The optional name of the CA.
-  #   caName: ca-orderer
+    # Fabric-CA supports dynamic user enrollment via REST APIs. A "root" user, a.k.a registrar, is
+    # needed to enroll and invoke new users.
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+    # [Optional] The optional name of the CA.
+    caName: ca-orderer
 
 # EntityMatchers enable substitution of network hostnames with static configurations
  # so that properties can be mapped. Regex can be used for this purpose
@@ -533,64 +533,62 @@ certificateAuthorities:
  # SubstitutionExp for the fields gprcOptions.ssl-target-name-override respectively
 # In any case mappedHost's config will be used, so mapped host cannot be empty, if entityMatchers are used
 #entityMatchers:
-#entityMatchers:
-#  peer:
-#    - pattern: (\w+).org1.example.com:(\d+)
-#      urlSubstitutionExp: ${1}.org1.example.com:${2}
-#      sslTargetOverrideUrlSubstitutionExp: ${1}.org1.example.com
-#      mappedHost: peer0.org1.example.com
-#
-#    - pattern: (\w+).org2.example.com:(\d+)
-#      urlSubstitutionExp: ${1}.org2.example.com:${2}
-#      sslTargetOverrideUrlSubstitutionExp: ${1}.org2.example.com
-#      mappedHost: peer0.org2.example.com
+entityMatchers:
+  peer:
+    - pattern: (\w*)peer0.org1.blockNet.com(\w*)
+      urlSubstitutionExp: localhost:7051
+      eventUrlSubstitutionExp: localhost:7053
+      sslTargetOverrideUrlSubstitutionExp: peer0.org1.blockNet.com
+      mappedHost: peer0.org1.blockNet.com
 
-#    - pattern: (\w+).org1.example.(\w+)
-#      urlSubstitutionExp: peer0.org1.example.com:7051
-#      sslTargetOverrideUrlSubstitutionExp: peer0.org1.example.com
-#      mappedHost: peer0.org1.example.com
-#
-#    - pattern: (\w+).org2.example.(\w+)
-#      urlSubstitutionExp: peer0.org2.example.com:8051
-#      sslTargetOverrideUrlSubstitutionExp: peer0.org2.example.com
-#      mappedHost: peer0.org2.example.com
-#
-#    - pattern: (\w+).example1.(\w+):(\d+)
-#      urlSubstitutionExp: ${1}.org1.example.${2}:${3}
-#      sslTargetOverrideUrlSubstitutionExp: ${1}.org1.example.${2}
-#      mappedHost: peer0.org1.example.com
-#
-#    - pattern: (\w+).org1.example.(\w+):(\d+)
-#      urlSubstitutionExp: peer0.org1.example.com:7051
-#      sslTargetOverrideUrlSubstitutionExp: peer0.org1.example.com
-#      mappedHost: peer0.org1.example.com
-#
-#  orderer:
-#    - pattern: (\w+).example.(\w+)
-#      urlSubstitutionExp: orderer.example.com:7050
-#      sslTargetOverrideUrlSubstitutionExp: orderer.example.com
-#      mappedHost: orderer.example.com
-#
-#    - pattern: (\w+).example2.(\w+)
-#      urlSubstitutionExp: localhost:7050
-#      sslTargetOverrideUrlSubstitutionExp: localhost
-#      mappedHost: orderer.example.com
-#
-#    - pattern: (\w+).example3.(\w+)
-#      urlSubstitutionExp:
-#      sslTargetOverrideUrlSubstitutionExp:
-#      mappedHost: orderer.example.com
-#
-#    - pattern: (\w+).example4.(\w+):(\d+)
-#      urlSubstitutionExp: ${1}.example.${2}:${3}
-#      sslTargetOverrideUrlSubstitutionExp: ${1}.example.${2}
-#      mappedHost: orderer.example.com
-#
-#  certificateAuthority:
-#    - pattern: (\w+).org1.example.(\w+)
-#      urlSubstitutionExp:
-#      mappedHost: ca.org1.example.com
-#
-#    - pattern: (\w+).org2.example.(\w+)
-#      urlSubstitutionExp:
-#      mappedHost: ca.org2.example.com
+    - pattern: (\w*)peer1.org1.blockNet.com(\w*)
+      urlSubstitutionExp: localhost:8051
+      eventUrlSubstitutionExp: localhost:8053
+      sslTargetOverrideUrlSubstitutionExp: peer1.org1.blockNet.com
+      mappedHost: peer1.org1.blockNet.com
+    
+    - pattern: (\w*)peer0.org2.blockNet.com(\w*)
+      urlSubstitutionExp: localhost:9051
+      eventUrlSubstitutionExp: localhost:9053
+      sslTargetOverrideUrlSubstitutionExp: peer0.org2.blockNet.com
+      mappedHost: peer0.org2.blockNet.com
+
+    - pattern: (\w*)peer1.org2.blockNet.com(\w*)
+      urlSubstitutionExp: localhost:10051
+      eventUrlSubstitutionExp: localhost:10053
+      sslTargetOverrideUrlSubstitutionExp: peer1.org2.blockNet.com
+      mappedHost: peer1.org2.blockNet.com
+
+  orderer:
+    - pattern: (\w*)orderer1.blockNet.com(\w*)
+      urlSubstitutionExp: localhost:7050
+      sslTargetOverrideUrlSubstitutionExp: orderer1.blockNet.com
+      mappedHost: orderer1.blockNet.com
+
+    - pattern: (\w*)orderer2.blockNet.com(\w*)
+      urlSubstitutionExp: localhost:8050
+      sslTargetOverrideUrlSubstitutionExp: orderer2.blockNet.com
+      mappedHost: orderer2.blockNet.com
+
+    - pattern: (\w*)orderer3.blockNet.com(\w*)
+      urlSubstitutionExp: localhost:9050
+      sslTargetOverrideUrlSubstitutionExp: orderer3.blockNet.com
+      mappedHost: orderer3.blockNet.com
+
+    - pattern: (\w*)orderer4.blockNet.com(\w*)
+      urlSubstitutionExp: localhost:10050
+      sslTargetOverrideUrlSubstitutionExp: orderer4.blockNet.com
+      mappedHost: orderer4.blockNet.com
+
+  certificateAuthorities:
+    - pattern: (\w*)ca-org1(\w*)
+      urlSubstitutionExp: http://localhost:7054
+      mappedHost: ca-org1
+
+    - pattern: (\w*)ca-org2(\w*)
+      urlSubstitutionExp: http://localhost:8054
+      mappedHost: ca-org2
+
+    - pattern: (\w*)ca-orderer(\w*)
+      urlSubstitutionExp: http://localhost:9054
+      mappedHost: ca-orderer

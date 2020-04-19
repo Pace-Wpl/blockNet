@@ -13,6 +13,7 @@ import (
 type ServiceSetup struct {
 	ChaincodeID string
 	Client      *channel.Client
+	Sdk         *fabsdk.FabricSDK
 }
 
 var ServiceClient ServiceSetup
@@ -22,7 +23,6 @@ func init() {
 	if err != nil {
 		panic(err.Error())
 	}
-	defer sdk.Close()
 
 	info := &def.InitInfo{ChannelID: def.CHAINNEL_ID, UserName: def.USER_NAME, OrgName: def.ORG_NAME}
 
@@ -34,6 +34,7 @@ func init() {
 	ServiceClient = ServiceSetup{
 		ChaincodeID: def.CHAINCODE_ID,
 		Client:      channelClient,
+		Sdk:         sdk,
 	}
 }
 

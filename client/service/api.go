@@ -8,6 +8,8 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 )
 
+//initCar;
+//args: carinit struct
 func InitCar(car *def.CarInit) error {
 
 	// eventID := utils.NewUUID()

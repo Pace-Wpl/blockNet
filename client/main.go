@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/blockNet/client/service"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -16,7 +17,8 @@ func RegisterHandlers() *httprouter.Router {
 }
 
 func main() {
-
+	defer service.ServiceClient.Sdk.Close()
 	r := RegisterHandlers()
 	http.ListenAndServe(":8000", r)
+
 }
