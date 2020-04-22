@@ -29,6 +29,12 @@ func (t *BlockCarCC) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.getHistoryForCar(stub, args)
 	} else if fn == "deleteCar" {
 		return t.deleteCar(stub, args)
+	} else if fn == "putCar" {
+		return t.putCarDy(stub, args)
+	} else if fn == "test" {
+		return t.testChaincode(stub, args)
+	} else if fn == "testQ" {
+		return t.testChaincodeQ(stub, args)
 	}
 	return shim.Error("没有相应的方法！")
 }

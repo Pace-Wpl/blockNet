@@ -5,12 +5,16 @@ import (
 )
 
 const (
-	CONFIG_FILE  = "/home/pace/go/src/github.com/blockNet/client/config.yaml"
-	INITIALIZED  = false
-	CHAINCODE_ID = "mycc"
-	USER_NAME    = "User1"
-	ORG_NAME     = "Org1"
-	CHAINNEL_ID  = "mychannel1"
+	CONFIG_FILE      = "/home/pace/go/src/github.com/blockNet/client/config.yaml"
+	INITIALIZED      = false
+	CHAINCODE_ID     = "tc2"
+	USER_NAME        = "User1"
+	ORG_NAME         = "Org1"
+	CHAINNEL_ID      = "mychannel1"
+	ORG_ADMIN        = "Admin"
+	ORDERER_ORG_NAME = "orderer1.blockNet.com"
+	CHAINCODE_PATH   = "github.com/blockNet/chaincode/test"
+	CHANNEL_CONFIG   = "/home/pace/go/src/github.com/blockNet/channel-artifacts/channel.tx"
 )
 
 type InitInfo struct {
@@ -52,10 +56,26 @@ type Infomation struct {
 
 //request
 type CarInit struct {
-	CarNumber string `json:"carNumber"` // 车牌号
-	Owner     string `json:"owner"`     // 所有人
-	ID        string `json:infoID`      // 车辆信息id
-	Name      string `json:"name"`
-	Lock      string `json:"isLock"`    // 是否上锁
-	Commander string `json:"commander"` // 命令执行者
+	ObjectType string `json:"objectType"`
+	Name       string `json:"name"`
+	CarNumber  string `json:"carNumber"` // 车牌号
+	ID         string `json:"infoId"`    // 车辆信息id
+	Owner      string `json:"owner"`     // 所有人
+	Type       string `json:"carType"`   // 车型号
+	Colour     string `json:"carColour"` // 车颜色
+}
+
+//response
+type CarResp struct {
+	Name        string  `json:"name"`
+	CarNumber   string  `json:"carNumber"`   // 车牌号
+	ID          string  `json:"infoId"`      // 车辆信息id
+	Owner       string  `json:"owner"`       // 所有人
+	Type        string  `json:"carType"`     // 车型号
+	Colour      string  `json:"carColour"`   // 车颜色
+	Lock        bool    `json:"isLock"`      // 是否上锁
+	Commander   string  `json:"commander"`   // 命令执行者
+	Velocity    float32 `json:"velocity"`    //速度
+	Temperature float32 `json:"temperature"` //温度
+	FaultCode   string  `json:"faultCode"`   // 故障码
 }

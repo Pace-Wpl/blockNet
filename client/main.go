@@ -35,6 +35,8 @@ func RegisterHandlers() *httprouter.Router {
 
 	router.POST("/car", InitCar)
 	router.GET("/car/:car_num", GetCar)
+	router.GET("/test/:key", TestChaincode)
+	router.GET("/q/:key", TestChaincodQ)
 
 	return router
 }

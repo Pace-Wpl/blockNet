@@ -31,7 +31,7 @@ services:
     networks:
       - byfn
     volumes:
-      - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ../channel-artifacts/tgenesis.block:/var/hyperledger/orderer/orderer.genesis.block
       - ../crypto-config/orderOrganization/blockNet.com/orderers/orderer1.blockNet.com/msp:/var/hyperledger/orderer/msp
       - ../crypto-config/orderOrganization/blockNet.com/orderers/orderer1.blockNet.com/tls/:/var/hyperledger/orderer/tls
       - ../store/o1:/var/hyperledger/production/orderer
@@ -50,7 +50,7 @@ services:
     networks:
       - byfn
     volumes:
-      - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ../channel-artifacts/tgenesis.block:/var/hyperledger/orderer/orderer.genesis.block
       - ../crypto-config/orderOrganization/blockNet.com/orderers/orderer2.blockNet.com/msp:/var/hyperledger/orderer/msp
       - ../crypto-config/orderOrganization/blockNet.com/orderers/orderer2.blockNet.com/tls/:/var/hyperledger/orderer/tls
       - ../store/o2:/var/hyperledger/production/orderer
@@ -67,7 +67,7 @@ services:
     networks:
       - byfn
     volumes:
-      - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ../channel-artifacts/tgenesis.block:/var/hyperledger/orderer/orderer.genesis.block
       - ../crypto-config/orderOrganization/blockNet.com/orderers/orderer3.blockNet.com/msp:/var/hyperledger/orderer/msp
       - ../crypto-config/orderOrganization/blockNet.com/orderers/orderer3.blockNet.com/tls/:/var/hyperledger/orderer/tls
       - ../store/o3:/var/hyperledger/production/orderer
@@ -84,7 +84,7 @@ services:
     networks:
       - byfn
     volumes:
-      - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ../channel-artifacts/tgenesis.block:/var/hyperledger/orderer/orderer.genesis.block
       - ../crypto-config/orderOrganization/blockNet.com/orderers/orderer4.blockNet.com/msp:/var/hyperledger/orderer/msp
       - ../crypto-config/orderOrganization/blockNet.com/orderers/orderer4.blockNet.com/tls/:/var/hyperledger/orderer/tls
       - ../store/o4:/var/hyperledger/production/orderer
@@ -129,7 +129,7 @@ services:
       - CORE_PEER_CHAINCODEADDRESS=peer1.org1.blockNet.com:8052
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:8052
       - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.blockNet.com:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org1.blockNet.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org1.blockNet.com:8051
       - CORE_PEER_LOCALMSPID=Org1MSP
     networks:
       - byfn
@@ -193,7 +193,7 @@ services:
 
   cli:
     container_name: cli
-    image: hyperledger/fabric-tools:latest
+    image: hyperledger/fabric-tools:amd64-1.4.4
     tty: true
     stdin_open: true
     environment:
