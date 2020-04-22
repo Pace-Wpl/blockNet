@@ -11,11 +11,13 @@ import (
 func TestChaincod(key string) error {
 	req := channel.Request{ChaincodeID: ServiceClient.ChaincodeID, Fcn: "test", Args: [][]byte{[]byte(key)}}
 	log.Printf("execute key:%s\n", key)
-	_, err := ServiceClient.Client.Execute(req)
+	resp, err := ServiceClient.Client.Execute(req)
 	if err != nil {
 		log.Printf("request err:%s !\n", err)
 		return err
 	}
+	log.Println(string(resp.Payload))
+	return nil
 	return nil
 }
 
