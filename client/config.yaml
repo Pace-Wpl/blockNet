@@ -227,7 +227,7 @@ organizations:
     cryptoPath: peerOrganizations/org1.blocknet.com/users/{userName}@org1.blocknet.com/msp
     peers:
       - peer0.org1.blocknet.com
-      - peer1.org1.blockmet.com
+      - peer1.org1.blocknet.com
 
     users:
       User1:
@@ -258,12 +258,12 @@ organizations:
     users:
       User1:
         cert: 
-          path: ../crypto-config/peerOrganizations/org2.blocknet.com/users/User1@org2.blocknet.com/msp/signcerts/cert.pem
+          path: ../crypto-config/peerOrganizations/org2.blocknet.com/users/User1@org2.blocknet.com/msp/signcerts/User1@org2.blocknet.com-cert.pem
         
           
       Admin:
         cert:
-          path: ../crypto-config/peerOrganizations/org2.blocknet.com/users/Admin@org2.blocknet.com/msp/signcerts/cert.pem
+          path: ../crypto-config/peerOrganizations/org2.blocknet.com/users/Admin@org2.blocknet.com/msp/signcerts/Admin@org2.blocknet.com-cert.pem
 
   #   # [Optional]. Certificate Authorities issue certificates for identification purposes in a Fabric based
   #   # network. Typically certificates provisioning is done in a separate process outside of the
@@ -338,7 +338,7 @@ orderers:
 
     tlsCACerts:
       # Certificate location absolute path
-      path: ../crypto-config/orderOrganization/blocknet.com/orderers/orderer2.blocknet.com/msp/tlscacerts/tlsca.blocknet.com-cert.pem
+      path: ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer2.blocknet.com/msp/tlscacerts/tlsca.blocknet.com-cert.pem
 
   orderer3.blocknet.com:
     url: localhost:9050
@@ -359,7 +359,7 @@ orderers:
 
     tlsCACerts:
       # Certificate location absolute path
-      path: ../crypto-config/orderOrganization/blocknet.com/orderers/orderer3.blocknet.com/msp/tlscacerts/tlsca.blocknet.com-cert.pem
+      path: ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer3.blocknet.com/msp/tlscacerts/tlsca.blocknet.com-cert.pem
 
   orderer4.blocknet.com:
     url: localhost:10050
@@ -380,7 +380,7 @@ orderers:
 
     tlsCACerts:
       # Certificate location absolute path
-      path: ../crypto-config/orderOrganization/blocknet.com/orderers/orderer4.blocknet.com/msp/tlscacerts/tlsca.blocknet.com-cert.pem
+      path: ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer4.blocknet.com/msp/tlscacerts/tlsca.blocknet.com-cert.pem
 
   orderer5.blocknet.com:
     url: localhost:11050
@@ -401,7 +401,7 @@ orderers:
 
     tlsCACerts:
       # Certificate location absolute path
-      path: ../crypto-config/orderOrganization/blocknet.com/orderers/orderer5.blocknet.com/msp/tlscacerts/tlsca.blocknet.com-cert.pem
+      path: ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer5.blocknet.com/msp/tlscacerts/tlsca.blocknet.com-cert.pem
 
 #
 # List of peers to send various requests to, including endorsement, query
