@@ -8,6 +8,29 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 )
 
+func TestChaincod(key string) error {
+	req := channel.Request{ChaincodeID: ServiceClient.ChaincodeID, Fcn: "test", Args: [][]byte{[]byte(key)}}
+	log.Printf("execute key:%s\n", key)
+	_, err := ServiceClient.Client.Execute(req)
+	if err != nil {
+		log.Printf("request err:%s !\n", err)
+		return err
+	}
+	return nil
+}
+
+func TestChaincodQ(key string) error {
+	req := channel.Request{ChaincodeID: ServiceClient.ChaincodeID, Fcn: "testQ", Args: [][]byte{[]byte(key)}}
+	log.Printf("query key:%s\n", key)
+	resp, err := ServiceClient.Client.Query(req)
+	if err != nil {
+		log.Printf("request err:%s !\n", err)
+		return err
+	}
+	log.Println(string(resp.Payload))
+	return nil
+}
+
 //initCar;
 //args: carinit struct
 func InitCar(car *def.CarInit) error {

@@ -12,6 +12,25 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+func TestChaincode(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	k := p.ByName("key")
+	fmt.Println(k)
+	if err := service.TestChaincod(k); err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+}
+
+func TestChaincodQ(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	k := p.ByName("key")
+	fmt.Println(k)
+	if err := service.TestChaincodQ(k); err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+}
+
 func InitCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	res, _ := ioutil.ReadAll(r.Body)
 	ubody := &def.CarInit{}

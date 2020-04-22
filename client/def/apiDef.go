@@ -5,12 +5,16 @@ import (
 )
 
 const (
-	CONFIG_FILE  = "/home/pace/go/src/github.com/blockNet/client/config.yaml"
-	INITIALIZED  = false
-	CHAINCODE_ID = "mycc"
-	USER_NAME    = "User1"
-	ORG_NAME     = "Org1"
-	CHAINNEL_ID  = "mychannel1"
+	CONFIG_FILE      = "/home/pace/go/src/github.com/blockNet/client/config.yaml"
+	INITIALIZED      = false
+	CHAINCODE_ID     = "tcc2"
+	USER_NAME        = "User1"
+	ORG_NAME         = "Org1"
+	CHAINNEL_ID      = "mychannel2"
+	ORG_ADMIN        = "Admin"
+	ORDERER_ORG_NAME = "orderer1.blocknet.com"
+	CHAINCODE_PATH   = "github.com/blockNet/chaincode/test"
+	CHANNEL_CONFIG   = "/home/pace/go/src/github.com/blockNet/channel-artifacts/channel1.tx"
 )
 
 type InitInfo struct {
