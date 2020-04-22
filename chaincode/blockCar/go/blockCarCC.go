@@ -13,40 +13,134 @@ import (
 	"github.com/hyperledger/fabric-protos-go/peer"
 )
 
-//init;
-//args: 车牌，所有人，信息id，名字，上锁，命令执行人，
-func (t *BlockCarCC) initCar(stub shim.ChaincodeStubInterface, args []string) peer.Response {
-
-	carNum := args[0]
-
-	//判断 carNum 是否存在
-	carNumAsBytes, err := stub.GetState(carNum)
-
+func (t *BlockCarCC) testChaincode(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	value := "test chaincode!"
+	err := stub.PutState(args[0], []byte(value))
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 
-	if carNumAsBytes != nil {
-		return shim.Error("carCd 已经存在！")
-	}
+	return shim.Success([]byte("test sucess!"))
+}
 
-	owner := args[1]
-	infoId := args[2]
-	name := args[3]
-	lock, err := strconv.ParseBool(args[4])
+func (t *BlockCarCC) testChaincodeQ(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+
+	res, err := stub.GetState(args[0])
 	if err != nil {
-		return shim.Error("参数5必须是true or false！")
+		return shim.Error(err.Error())
 	}
-	commander := args[5]
-	objectType := "car"
-	sensor := &def.Sensor{ObjectType: "sensor", Velocity: 0.0, Temperature: 28.0, FaultCode: "null"}
-	info := &def.Infomation{ObjectType: "carInfo", ID: infoId, Name: name, CarNumber: carNum}
 
-	car := &def.Car{objectType, lock, commander, *info, *sensor, owner}
+	return shim.Success([]byte(res))
+}
 
+//init;
+//args: json CarInfomation, json CarDy
+func (t *BlockCarCC) initCar(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+
+	carInfo := &def.CarInfomation{}
+	if err := json.Unmarshal([]byte(args[0]), carInfo); err != nil {
+		return shim.Error(def.ErrorBadRequest)
+	}
+
+	//判断 carid 是否存在
+	carInfoAsBytes, err := stub.GetState(carInfo.ID)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	if carInfoAsBytes != nil {
+		return shim.Error("car  已经存在！")
+	}
+
+	carInfo.ObjectType = "carInfomation"
+	carJsonAsBytes, err := json.Marshal(carInfo)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	err = stub.PutState(carInfo.ID, carJsonAsBytes)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	err = stub.PutState(carInfo.CarNumber, []byte(args[1]))
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	err = stub.SetEvent(args[2], []byte{}) //set event init
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(nil)
+}
+
+//updataCar 更新汽车静态信息;
+//args: json carimfomation, event id
+func (t *BlockCarCC) updataCar(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+
+	car := &def.CarInfomation{}
+	if err := json.Unmarshal([]byte(args[0]), car); err != nil {
+		return shim.Error(def.ErrorBadRequest)
+	}
+
+	//判断 carNum 是否存在
+	carInfoAsBytes, err := stub.GetState(car.ID)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	if carInfoAsBytes == nil {
+		return shim.Error("car  不存在！")
+	}
+
+	car.ObjectType = "carInfomation"
 	carJsonAsBytes, err := json.Marshal(car)
+	if err != nil {
+		return shim.Error(def.ErrorInternalFaults)
+	}
 
-	err = stub.PutState(carNum, carJsonAsBytes)
+	err = stub.PutState(car.ID, carJsonAsBytes)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	err = stub.SetEvent(args[1], []byte{}) //set event
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(nil)
+}
+
+//putCarDy 更新汽车动态信息;
+//args: json carDyReq
+func (t *BlockCarCC) putCarDy(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	carDyReq := &def.CarDyReq{}
+	if err := json.Unmarshal([]byte(args[0]), carDyReq); err != nil {
+		return shim.Error(def.ErrorBadRequest)
+	}
+
+	//判断 carNum 是否存在
+	// carDyAsBytes, err := stub.GetState(carDyReq.CarNumber)
+	// if err != nil {
+	// 	return shim.Error(err.Error())
+	// }
+	// if carDyAsBytes == nil {
+	// 	return shim.Error("car  不存在！")
+	// }
+
+	CarDy := &def.CarDy{ObjectType: "carDy", Lock: carDyReq.Lock, Commander: carDyReq.Commander, Velocity: carDyReq.Velocity, Temperature: carDyReq.Temperature, FaultCode: carDyReq.FaultCode}
+	CarDyJSON, err := json.Marshal(CarDy)
+	if err != nil {
+		return shim.Error(def.ErrorInternalFaults)
+	}
+
+	err = stub.PutState(carDyReq.CarNumber, CarDyJSON)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	err = faultHandle(stub, carDyReq)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -95,58 +189,68 @@ func (t *BlockCarCC) queryCarByOwner(stub shim.ChaincodeStubInterface, args []st
 	return shim.Success(buffer.Bytes())
 }
 
-//根据车牌查询car;
-//args: 车牌
+//根据信息id查询car;
+//args: 信息id
 func (t *BlockCarCC) readCar(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
-	carNum := args[0]
+	carId := args[0]
 
-	carAsBytes, err := stub.GetState(carNum)
+	carInfoAsBytes, err := stub.GetState(carId)
 
 	if err != nil {
 		return shim.Error(err.Error())
-	} else if carAsBytes == nil {
+	} else if carInfoAsBytes == nil {
 		return shim.Error("car 信息不存在！")
 	}
 
-	return shim.Success(carAsBytes)
+	carInfo := &def.CarInfomation{}
+	if err = json.Unmarshal(carInfoAsBytes, carInfo); err != nil {
+		return shim.Error(err.Error())
+	}
+
+	carDyAsBytes, err := stub.GetState(carInfo.CarNumber)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	carDy := &def.CarDy{}
+	if err = json.Unmarshal(carDyAsBytes, carDy); err != nil {
+		return shim.Error(err.Error())
+	}
+
+	rulst := &def.CarResp{
+		Name: carInfo.Name, CarNumber: carInfo.CarNumber, ID: carInfo.ID, Owner: carInfo.Owner,
+		Type: carInfo.Type, Colour: carInfo.Colour, Lock: carDy.Lock, Commander: carDy.Commander,
+		Velocity: carDy.Velocity, Temperature: carDy.Temperature, FaultCode: carDy.FaultCode,
+	}
+
+	resp, err := json.Marshal(rulst)
+	if err = json.Unmarshal(carDyAsBytes, carDy); err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(resp)
 }
 
-//锁;
-//args: 车牌, 上锁/开锁 （true/false）, 命令人
+//上锁;
+//args:json carDyReq
 func (t *BlockCarCC) lockCar(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	carNum, err := putCar(stub, args)
 
-	carNum := args[0]
-
-	carStuAsBytes, err := stub.GetState(carNum)
-	if err != nil {
-		return shim.Error(err.Error())
-	} else if carStuAsBytes == nil {
-		return shim.Error("car 不存在！")
-	}
-
-	control, err := strconv.ParseBool(args[1])
-	if err != nil {
-		return shim.Error("参数2 为true/false！")
-	}
-
-	commander := args[2]
-
-	carStu := def.Car{}
-	err = json.Unmarshal(carStuAsBytes, &carStu)
+	err = stub.SetEvent(carNum+",islock", []byte("lock")) //set event lock
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 
-	carStu.Lock = control
-	carStu.Commander = commander
+	return shim.Success(nil)
+}
 
-	carStuJsonAsBytes, err := json.Marshal(carStu)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
+//开锁;
+//args:json carDyReq
+func (t *BlockCarCC) unLockCar(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	carNum, err := putCar(stub, args)
 
-	err = stub.PutState(carNum, carStuJsonAsBytes)
+	err = stub.SetEvent(carNum+",islock", []byte("unlock")) //set event lock
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -206,24 +310,79 @@ func (t *BlockCarCC) getHistoryForCar(stub shim.ChaincodeStubInterface, args []s
 }
 
 //删除车辆信息;
-//args: 车牌
+//args: 信息id
 func (t *BlockCarCC) deleteCar(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
-	carNum := args[0]
+	carId := args[0]
 
-	carStuAsBytes, err := stub.GetState(carNum)
-
+	carStuAsBytes, err := stub.GetState(carId)
 	if err != nil {
 		return shim.Error(err.Error())
 	} else if carStuAsBytes == nil {
 		return shim.Error("car not exist!")
 	}
 
-	err = stub.DelState(carNum)
+	carInfo := &def.CarInfomation{}
+	if err = json.Unmarshal(carStuAsBytes, carInfo); err != nil {
+		return shim.Error(err.Error())
+	}
 
+	err = stub.DelState(carInfo.CarNumber) // 删除动态信息
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	err = stub.DelState(carId) // 删除静态信息
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 
 	return shim.Success(nil)
+}
+
+//错误码处理
+func faultHandle(stub shim.ChaincodeStubInterface, carDy *def.CarDyReq) error {
+	switch carDy.FaultCode {
+	case "111":
+		err := stub.SetEvent(carDy.CarNumber+",faultcode", []byte("unknown error，fault code:"+carDy.FaultCode))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+//更新汽车动态信息
+func putCar(stub shim.ChaincodeStubInterface, args []string) (string, error) {
+	carDyReq := &def.CarDyReq{}
+	if err := json.Unmarshal([]byte(args[0]), carDyReq); err != nil {
+		return "", err
+	}
+
+	//判断 carNum 是否存在
+	// carDyAsBytes, err := stub.GetState(carDyReq.CarNumber)
+	// if err != nil {
+	// 	return err
+	// }
+	// if carDyAsBytes == nil {
+	// 	return shim.Error("car  不存在！")
+	// }
+
+	CarDy := &def.CarDy{ObjectType: "carDy", Lock: carDyReq.Lock, Commander: carDyReq.Commander, Velocity: carDyReq.Velocity, Temperature: carDyReq.Temperature, FaultCode: carDyReq.FaultCode}
+	CarDyJSON, err := json.Marshal(CarDy)
+	if err != nil {
+		return "", err
+	}
+
+	err = stub.PutState(carDyReq.CarNumber, CarDyJSON)
+	if err != nil {
+		return "", err
+	}
+
+	err = faultHandle(stub, carDyReq)
+	if err != nil {
+		return "", err
+	}
+
+	return carDyReq.CarNumber, nil
 }

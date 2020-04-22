@@ -17,18 +17,30 @@ func (t *BlockCarCC) Init(stub shim.ChaincodeStubInterface) peer.Response {
 func (t *BlockCarCC) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 
 	fn, args := stub.GetFunctionAndParameters()
-	if fn == "initCar" {
+	switch fn {
+	case "initCar":
 		return t.initCar(stub, args)
-	} else if fn == "queryCarByOwner" {
-		return t.queryCarByOwner(stub, args)
-	} else if fn == "readCar" {
+	case "readCar":
 		return t.readCar(stub, args)
-	} else if fn == "lock" {
+	case "lock":
 		return t.lockCar(stub, args)
-	} else if fn == "getHistoryForCar" {
-		return t.getHistoryForCar(stub, args)
-	} else if fn == "deleteCar" {
+	case "unlock":
+		return t.unLockCar(stub, args)
+	case "deleteCar":
 		return t.deleteCar(stub, args)
+	case "putCar":
+		return t.putCarDy(stub, args)
+	case "updataCar":
+		return t.updataCar(stub, args)
+	case "queryCarByOwner":
+		return t.queryCarByOwner(stub, args) //debug
+	case "getHistoryForCar":
+		return t.getHistoryForCar(stub, args) //debug
+	case "test":
+		return t.testChaincode(stub, args)
+	case "testQ":
+		return t.testChaincodeQ(stub, args)
+	default:
 	}
 	return shim.Error("没有相应的方法！")
 }
