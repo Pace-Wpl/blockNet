@@ -151,7 +151,7 @@ func (t *BlockCarCC) putCarDy(stub shim.ChaincodeStubInterface, args []string) p
 func (t *BlockCarCC) queryCarByOwner(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	owner := args[0]
-	queryStr := fmt.Sprintf("{\"selector\":{\"objectType\":\"%s\",\"owner\":\"%s\"}}", "carDy", owner)
+	queryStr := fmt.Sprintf("{\"selector\":{\"owner\":\"%s\"}}", owner)
 
 	resultIterator, err := stub.GetQueryResult(queryStr)
 	if err != nil {
@@ -160,17 +160,17 @@ func (t *BlockCarCC) queryCarByOwner(stub shim.ChaincodeStubInterface, args []st
 	defer resultIterator.Close()
 
 	var carItem []def.CarInfomation
-	var car *def.CarInfomation
+	var car def.CarInfomation
 	for resultIterator.HasNext() {
 		queryResponse, err := resultIterator.Next()
 		if err != nil {
 			return shim.Error(err.Error())
 		}
 
-		if err := json.Unmarshal(queryResponse.Value, car); err != nil {
+		if err := json.Unmarshal(queryResponse.Value, &car); err != nil {
 			return shim.Error(err.Error())
 		} else {
-			carItem = append(carItem, *car)
+			carItem = append(carItem, car)
 		}
 	}
 

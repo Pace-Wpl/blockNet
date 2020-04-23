@@ -143,7 +143,6 @@ func QueryCarByOwner(owenr string) (*def.OwenrCarItem, error) {
 	if err = json.Unmarshal(resp.Payload, item); err != nil {
 		return item, err
 	}
-
 	return item, nil
 }
 

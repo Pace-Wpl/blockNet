@@ -101,7 +101,7 @@ func LockCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 //request : owner
 func QueryCarByOwner(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	o := p.ByName("owner")
+	o := p.ByName("owner_name")
 	resp, err := service.QueryCarByOwner(o)
 	if err != nil {
 		log.Printf("error:%s\n", err)
