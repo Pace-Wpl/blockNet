@@ -37,7 +37,7 @@ func (t *BlockCarCC) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 	case "updataCar":
 		return t.updataCar(stub, args)
 	case "queryCarByOwner":
-		return t.queryCarByOwner(stub, args) //testing
+		return t.queryCarByOwner(stub, args)
 	case "getHistoryForCar":
 		return t.getHistoryForCar(stub, args)
 	case "updataRoad":

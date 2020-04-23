@@ -19,41 +19,41 @@ func tcpHandle(conn *net.TCPConn, msg string) {
 	case "initCar":
 		initCar(conn, com[1:])
 	case "getCar":
-		GetCar(conn, com[1:])
+		getCar(conn, com[1:])
 	case "getState":
-		GetState(conn, com[1:])
+		getState(conn, com[1:])
 	case "putCarDy":
-		PutCarDy(conn, com[1:])
+		putCarDy(conn, com[1:])
 	case "lockCar":
-		LockCar(conn, com[1:])
+		lockCar(conn, com[1:])
 	case "unlock":
-		return t.unLockCar(stub, args)
+		unLockCar(conn, com[1:])
 	case "queryCarByOwner":
-		QueryCarByOwner(conn, com[1:])
+		queryCarByOwner(conn, com[1:])
 	case "queryCarHistry":
-		QueryCarHistry(conn, com[1:])
+		queryCarHistry(conn, com[1:])
 	case "deleteCar":
-		return t.deleteCar(stub, args)
+		deleteCar(conn, com[1:])
 	case "checkRGL":
-		return t.checkRGL(stub, args)
+		checkRGL(conn, com[1:])
 	case "updataCar":
-		return t.updataCar(stub, args)
+		updataCar(conn, com[1:])
 	case "updataRoad":
-		return t.updataRoad(stub, args)
+		updataRoad(conn, com[1:])
 	case "readRoad":
-		return t.readRoad(stub, args)
+		getRoad(conn, com[1:])
 	case "deleteRoad":
-		return t.deleteRoad(stub, args)
+		deleteRoad(conn, com[1:])
 	case "onRoad":
-		return t.onRoad(stub, args)
+		onRoad(conn, com[1:])
 	case "updataRGL":
-		return t.updataRGL(stub, args)
+		updataRGL(conn, com[1:])
 	case "readRGL":
-		return t.readRgl(stub, args)
+		getRGL(conn, com[1:])
 	case "deleteRGL":
-		return t.dealRGL(stub, args)
+		dealRGL(conn, com[1:])
 	case "getHistoryRGL":
-		return t.getHistryRgl(stub, args)
+		getHistoryRGL(conn, com[1:])
 	default:
 	}
 	sendErrorResponse(conn, errors.New("没有相应的方法！"))

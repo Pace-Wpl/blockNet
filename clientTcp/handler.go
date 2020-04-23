@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func TestChaincode(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func testChaincode(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	k := p.ByName("key")
 	fmt.Println(k)
 	if err := service.TestChaincod(k); err != nil {
@@ -22,7 +22,7 @@ func TestChaincode(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 
 }
 
-func TestChaincodQ(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func testChaincodQ(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	k := p.ByName("key")
 	fmt.Println(k)
 	if err := service.TestChaincodQ(k); err != nil {
@@ -67,7 +67,7 @@ func initCar(conn *net.TCPConn, msgs []string) {
 }
 
 //request args:car id
-func GetCar(conn *net.TCPConn, args []string) {
+func getCar(conn *net.TCPConn, args []string) {
 	carNum := args[0]
 
 	car, err := service.GetCar(carNum)
@@ -80,7 +80,7 @@ func GetCar(conn *net.TCPConn, args []string) {
 }
 
 //request args:carnum
-func GetState(conn *net.TCPConn, args []string) {
+func getState(conn *net.TCPConn, args []string) {
 	carNum := args[0]
 
 	car, err := service.GetState(carNum)
@@ -93,7 +93,7 @@ func GetState(conn *net.TCPConn, args []string) {
 }
 
 //request body:carnum,lock,commander,v,t,f
-func PutCarDy(conn *net.TCPConn, args []string) {
+func putCarDy(conn *net.TCPConn, args []string) {
 	lock, err := strconv.ParseBool(args[1])
 	if err != nil {
 		sendErrorResponse(conn, errors.New("参数lock,3错误！"))
@@ -126,7 +126,7 @@ func PutCarDy(conn *net.TCPConn, args []string) {
 }
 
 //request body: carnum,lock,commander,v,t,f
-func LockCar(conn *net.TCPConn, args []string) {
+func lockCar(conn *net.TCPConn, args []string) {
 	lock, err := strconv.ParseBool(args[1])
 	if err != nil {
 		sendErrorResponse(conn, errors.New("参数lock,3错误！"))
@@ -158,8 +158,41 @@ func LockCar(conn *net.TCPConn, args []string) {
 	sendNormalResponse(conn, []byte(resp))
 }
 
+//request body: carnum,lock,commander,v,t,f
+func unLockCar(conn *net.TCPConn, args []string) {
+	lock, err := strconv.ParseBool(args[1])
+	if err != nil {
+		sendErrorResponse(conn, errors.New("参数lock,3错误！"))
+		return
+	}
+
+	v, err := strconv.ParseFloat(args[3], 32)
+	if err != nil {
+		sendErrorResponse(conn, errors.New("参数velocity,5错误！"))
+		return
+	}
+
+	t, err := strconv.ParseFloat(args[4], 32)
+	if err != nil {
+		sendErrorResponse(conn, errors.New("参数Temperature,6错误！"))
+		return
+	}
+	ubody := &def.CarDyReq{
+		CarNumber: args[0], Lock: lock, Commander: args[2], Velocity: float32(v), Temperature: float32(t),
+		FaultCode: args[5],
+	}
+
+	resp, err := service.UnLockCar(ubody)
+	if err != nil {
+		sendErrorResponse(conn, err)
+		fmt.Println(err)
+	}
+
+	sendNormalResponse(conn, []byte(resp))
+}
+
 //request : owner
-func QueryCarByOwner(conn *net.TCPConn, args []string) {
+func queryCarByOwner(conn *net.TCPConn, args []string) {
 	o := args[0]
 	resp, err := service.QueryCarByOwner(o)
 	if err != nil {
@@ -171,9 +204,180 @@ func QueryCarByOwner(conn *net.TCPConn, args []string) {
 }
 
 //request: carNum
-func QueryCarHistry(conn *net.TCPConn, args []string) {
+func queryCarHistry(conn *net.TCPConn, args []string) {
 	carNum := args[0]
 	resp, err := service.QueryHistoryForCar(carNum)
+	if err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	sendNormalResponse(conn, resp)
+}
+
+//reuqets: carid
+func deleteCar(conn *net.TCPConn, args []string) {
+	carID := args[0]
+	resp, err := service.DeleteCar(carID)
+	if err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	sendNormalResponse(conn, resp)
+}
+
+//reuqest: carnum,road,v
+func checkRGL(conn *net.TCPConn, args []string) {
+	v, err := strconv.ParseFloat(args[2], 32)
+	if err != nil {
+		sendErrorResponse(conn, errors.New("参数4错误！"))
+		return
+	}
+	cRgl := &def.CheckRGL{
+		CarNumber: args[0], Road: args[1], Velocity: float32(v),
+	}
+
+	resp, err := service.CheckRGL(cRgl)
+	if err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	sendNormalResponse(conn, resp)
+}
+
+//request: name,carnum,carid,owner,type,colour
+func updataCar(conn *net.TCPConn, args []string) {
+	carInfo := &def.CarInfomation{
+		ObjectType: "carInfomation", Name: args[0], CarNumber: args[1], ID: args[2], Owner: args[3],
+		Type: args[4], Colour: args[5],
+	}
+
+	resp, err := service.UpdataCar(carInfo)
+	if err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	sendNormalResponse(conn, resp)
+}
+
+//request: road code,name,Coordinate,type,limit,tag
+func updataRoad(conn *net.TCPConn, args []string) {
+	l, err := strconv.ParseFloat(args[4], 32)
+	if err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	t, err := strconv.Atoi(args[5])
+	if err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	roadInfo := &def.RoadInformation{
+		ObjectType: "roadInfomation", Code: args[0], Name: args[1], Coordinate: args[2], Type: args[3],
+		Limit: float32(l), Tag: t,
+	}
+
+	resp, err := service.UpdataRoad(roadInfo)
+	if err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	sendNormalResponse(conn, resp)
+}
+
+//request: road code
+func getRoad(conn *net.TCPConn, args []string) {
+	roadCode := args[0]
+
+	resp, err := service.GetRoad(roadCode)
+	if err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	sendNormalResponse(conn, resp)
+}
+
+//request: road code
+func deleteRoad(conn *net.TCPConn, args []string) {
+	roadCode := args[0]
+
+	resp, err := service.GetRoad(roadCode)
+	if err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	sendNormalResponse(conn, resp)
+}
+
+//request: road code,carnum
+func onRoad(conn *net.TCPConn, args []string) {
+	roadCode := args[0]
+	carNum := args[1]
+
+	resp, err := service.OnRoad(roadCode, carNum)
+	if err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	sendNormalResponse(conn, resp)
+}
+
+//request:rgl id,carnum,road,type,mes
+func updataRGL(conn *net.TCPConn, args []string) {
+	rglInfo := &def.RegulationsInfo{
+		ObjectType: "RegulationsInfo", ID: args[0], CarNumber: args[1], Road: args[2], Type: args[3],
+		Mes: args[4],
+	}
+
+	resp, err := service.UpdataRGL(rglInfo)
+	if err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	sendNormalResponse(conn, resp)
+}
+
+//request:rgl id
+func getRGL(conn *net.TCPConn, args []string) {
+	rglId := args[0]
+
+	resp, err := service.GetRGL(rglId)
+	if err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	sendNormalResponse(conn, resp)
+}
+
+//request:rgl id
+func dealRGL(conn *net.TCPConn, args []string) {
+	rglId := args[0]
+
+	resp, err := service.DealRGL(rglId)
+	if err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	sendNormalResponse(conn, resp)
+}
+
+//request:rgl id
+func getHistoryRGL(conn *net.TCPConn, args []string) {
+	rglId := args[0]
+
+	resp, err := service.GetHistoryRGL(rglId)
 	if err != nil {
 		sendErrorResponse(conn, err)
 		return
