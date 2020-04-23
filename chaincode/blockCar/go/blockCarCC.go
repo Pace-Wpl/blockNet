@@ -32,7 +32,7 @@ func (t *BlockCarCC) testChaincodeQ(stub shim.ChaincodeStubInterface, args []str
 }
 
 //init;
-//args: json CarInfomation, json CarDy
+//args: json CarInfomation, json CarDy, event id
 func (t *BlockCarCC) initCar(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	carInfo := &def.CarInfomation{}
@@ -151,7 +151,7 @@ func (t *BlockCarCC) putCarDy(stub shim.ChaincodeStubInterface, args []string) p
 func (t *BlockCarCC) queryCarByOwner(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	owner := args[0]
-	queryStr := fmt.Sprintf("{\"selector\":{\"owner\":\"%s\"}}", owner)
+	queryStr := fmt.Sprintf("{\"selector\":{\"objectType\":\"%s\",\"owner\":\"%s\"}}", "carDy", owner)
 
 	resultIterator, err := stub.GetQueryResult(queryStr)
 	if err != nil {
@@ -334,7 +334,9 @@ func (t *BlockCarCC) deleteCar(stub shim.ChaincodeStubInterface, args []string) 
 //错误码处理
 func faultHandle(stub shim.ChaincodeStubInterface, carDy *def.CarDyReq) error {
 	switch carDy.FaultCode {
-	case "111":
+	case "":
+		return nil
+	default:
 		err := stub.SetEvent(carDy.CarNumber+",faultcode", []byte("unknown error，fault code:"+carDy.FaultCode))
 		if err != nil {
 			return err

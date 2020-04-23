@@ -31,23 +31,26 @@ func TestChaincodQ(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 	}
 }
 
+//initCar;
+//request body:json carinit
 func InitCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	res, _ := ioutil.ReadAll(r.Body)
 	ubody := &def.CarInit{}
 
 	if err := json.Unmarshal(res, ubody); err != nil {
-		fmt.Println(err.Error())
+		fmt.Printf("unmarshal error 1:%s\n", err)
 		return
 	}
 
-	if err := service.InitCar(ubody); err != nil {
-		fmt.Println(err.Error())
-		return
+	resp, err := service.InitCar(ubody)
+	if err != nil {
+		fmt.Printf("servic init error 2:%s\n", err)
 	}
 
-	fmt.Printf("Car init successful!\n")
+	fmt.Printf("Car init successful:%s!\n", resp)
 }
 
+//request body:string car id
 func GetCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	carNum := p.ByName("car_num")
 
@@ -58,4 +61,64 @@ func GetCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	}
 
 	fmt.Println(car)
+}
+
+//request body:json carDyReq
+func PutCarDy(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	res, _ := ioutil.ReadAll(r.Body)
+	ubody := &def.CarDyReq{}
+
+	if err := json.Unmarshal(res, ubody); err != nil {
+		fmt.Println("request error!")
+		return
+	}
+
+	err := service.PutCarDy(ubody)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Printf("put carDy successful!\n")
+}
+
+//request body: json carDyReq
+func LockCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	res, _ := ioutil.ReadAll(r.Body)
+	ubody := &def.CarDyReq{}
+
+	if err := json.Unmarshal(res, ubody); err != nil {
+		fmt.Println("request error!")
+		return
+	}
+
+	resp, err := service.LockCar(ubody)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Printf("lock car successful:%s!\n", resp)
+}
+
+//request : owner
+func QueryCarByOwner(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	o := p.ByName("owner")
+	resp, err := service.QueryCarByOwner(o)
+	if err != nil {
+		log.Printf("error:%s\n", err)
+		return
+	}
+
+	fmt.Println(resp)
+}
+
+//request: carNum
+func QueryCarHistry(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	carNum := p.ByName("car_num")
+	resp, err := service.QueryHistoryForCar(carNum)
+	if err != nil {
+		log.Printf("error:%s\n", err)
+		return
+	}
+
+	fmt.Println(resp)
 }

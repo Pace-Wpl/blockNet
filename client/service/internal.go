@@ -19,12 +19,14 @@ func regitserEvent(client *ch.Client, chaincodeID, eventID string) (fab.Registra
 }
 
 //用eventID接受链码事件结果
-func eventResult(notifier <-chan *fab.CCEvent, eventID string) error {
+func eventResult(notifier <-chan *fab.CCEvent, eventID string) (string, error) {
 	select {
 	case ccEvent := <-notifier:
 		fmt.Printf("接收到链码事件: %v\n", ccEvent)
+		return ccEvent.EventName, nil
 	case <-time.After(time.Second * 20):
-		return fmt.Errorf("不能根据指定的事件ID接收到相应的链码事件(%s)", eventID)
+		fmt.Errorf("不能根据指定的事件ID接收到相应的链码事件(%s)", eventID)
+		return "不能根据指定的事件ID接收到相应的链码事件(" + eventID + ")", nil
 	}
-	return nil
+	return "", nil
 }
