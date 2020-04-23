@@ -9,12 +9,12 @@ volumes:
   orderer1.blocknet.com:
   orderer2.blocknet.com:
   orderer3.blocknet.com:
-  orderer4.blocknet.com:
-  orderer5.blocknet.com:
+  # orderer4.blocknet.com:
+  # orderer5.blocknet.com:
   peer0.org1.blocknet.com:
   peer1.org1.blocknet.com:
-  peer0.org2.blocknet.com:
-  peer1.org2.blocknet.com:
+  # peer0.org2.blocknet.com:
+  # peer1.org2.blocknet.com:
 
 networks:
   byfn:
@@ -59,35 +59,35 @@ services:
     ports:
     - 9050:7050
 
-  orderer4.blocknet.com:
-    extends:
-      file: base/peer-base.yaml
-      service: orderer-base
-    container_name: orderer4.blocknet.com
-    networks:
-    - byfn
-    volumes:
-        - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-        - ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer4.blocknet.com/msp:/var/hyperledger/orderer/msp
-        - ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer4.blocknet.com/tls/:/var/hyperledger/orderer/tls
-        - ../store/orderer4.blocknet.com:/var/hyperledger/production/orderer
-    ports:
-    - 10050:7050
+  # orderer4.blocknet.com:
+  #   extends:
+  #     file: base/peer-base.yaml
+  #     service: orderer-base
+  #   container_name: orderer4.blocknet.com
+  #   networks:
+  #   - byfn
+  #   volumes:
+  #       - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+  #       - ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer4.blocknet.com/msp:/var/hyperledger/orderer/msp
+  #       - ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer4.blocknet.com/tls/:/var/hyperledger/orderer/tls
+  #       - ../store/orderer4.blocknet.com:/var/hyperledger/production/orderer
+  #   ports:
+  #   - 10050:7050
 
-  orderer5.blocknet.com:
-    extends:
-      file: base/peer-base.yaml
-      service: orderer-base
-    container_name: orderer5.blocknet.com
-    networks:
-    - byfn
-    volumes:
-        - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-        - ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer5.blocknet.com/msp:/var/hyperledger/orderer/msp
-        - ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer5.blocknet.com/tls/:/var/hyperledger/orderer/tls
-        - ../store/orderer5.blocknet.com:/var/hyperledger/production/orderer
-    ports:
-    - 11050:7050
+  # orderer5.blocknet.com:
+  #   extends:
+  #     file: base/peer-base.yaml
+  #     service: orderer-base
+  #   container_name: orderer5.blocknet.com
+  #   networks:
+  #   - byfn
+  #   volumes:
+  #       - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+  #       - ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer5.blocknet.com/msp:/var/hyperledger/orderer/msp
+  #       - ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer5.blocknet.com/tls/:/var/hyperledger/orderer/tls
+  #       - ../store/orderer5.blocknet.com:/var/hyperledger/production/orderer
+  #   ports:
+  #   - 11050:7050
 
   peer0.org1.blocknet.com:
     container_name: peer0.org1.blocknet.com
@@ -105,21 +105,21 @@ services:
     networks:
       - byfn
 
-  peer0.org2.blocknet.com:
-    container_name: peer0.org2.blocknet.com
-    extends:
-      file:  base/docker-compose-base.yaml
-      service: peer0.org2.blocknet.com
-    networks:
-      - byfn
+  # peer0.org2.blocknet.com:
+  #   container_name: peer0.org2.blocknet.com
+  #   extends:
+  #     file:  base/docker-compose-base.yaml
+  #     service: peer0.org2.blocknet.com
+  #   networks:
+  #     - byfn
 
-  peer1.org2.blocknet.com:
-    container_name: peer1.org2.blocknet.com
-    extends:
-      file:  base/docker-compose-base.yaml
-      service: peer1.org2.blocknet.com
-    networks:
-      - byfn
+  # peer1.org2.blocknet.com:
+  #   container_name: peer1.org2.blocknet.com
+  #   extends:
+  #     file:  base/docker-compose-base.yaml
+  #     service: peer1.org2.blocknet.com
+  #   networks:
+  #     - byfn
 
   cli:
     container_name: cli
@@ -152,11 +152,11 @@ services:
       - orderer1.blocknet.com
       - orderer2.blocknet.com
       - orderer3.blocknet.com
-      - orderer4.blocknet.com
-      - orderer5.blocknet.com
+      # - orderer4.blocknet.com
+      # - orderer5.blocknet.com
       - peer0.org1.blocknet.com
       - peer1.org1.blocknet.com
-      - peer0.org2.blocknet.com
-      - peer1.org2.blocknet.com
+      # - peer0.org2.blocknet.com
+      # - peer1.org2.blocknet.com
     networks:
       - byfn

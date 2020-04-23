@@ -7,10 +7,10 @@ import (
 const (
 	CONFIG_FILE      = "/home/pace/go/src/github.com/blockNet/client/config.yaml"
 	INITIALIZED      = false
-	CHAINCODE_ID     = "tcc2"
+	CHAINCODE_ID     = "bcc"
 	USER_NAME        = "User1"
 	ORG_NAME         = "Org1"
-	CHAINNEL_ID      = "mychannel2"
+	CHAINNEL_ID      = "mychannel"
 	ORG_ADMIN        = "Admin"
 	ORDERER_ORG_NAME = "orderer1.blocknet.com"
 	CHAINCODE_PATH   = "github.com/blockNet/chaincode/test"
