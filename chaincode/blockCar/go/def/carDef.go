@@ -21,15 +21,6 @@ type CarInfomation struct {
 	Colour     string `json:"carColour"` // 车颜色
 }
 
-// 违章信息
-type Regulations struct {
-	ObjectType string `json:"objectType"`
-	Id         string `json:"regulationsId"` // 违章id
-	CarNumber  string `json:"carNumber"`     // 车牌号
-	Place      string `json:"place"`         // 违章地点
-	Type       string `json:"type"`          // 违章类型
-}
-
 //request
 type CarDyReq struct {
 	CarNumber   string  `json:"carNum"`      // 车牌号

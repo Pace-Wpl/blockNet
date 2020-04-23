@@ -225,7 +225,7 @@ func (t *BlockCarCC) readCar(stub shim.ChaincodeStubInterface, args []string) pe
 	}
 
 	resp, err := json.Marshal(rulst)
-	if err = json.Unmarshal(carDyAsBytes, carDy); err != nil {
+	if err != nil {
 		return shim.Error(err.Error())
 	}
 

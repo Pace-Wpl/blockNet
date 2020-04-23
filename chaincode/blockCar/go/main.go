@@ -30,12 +30,30 @@ func (t *BlockCarCC) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.deleteCar(stub, args)
 	case "putCar":
 		return t.putCarDy(stub, args)
+	case "checkRGL":
+		return t.checkRGL(stub, args)
 	case "updataCar":
 		return t.updataCar(stub, args)
 	case "queryCarByOwner":
 		return t.queryCarByOwner(stub, args) //debug
 	case "getHistoryForCar":
 		return t.getHistoryForCar(stub, args) //debug
+	case "updataRoad":
+		return t.updataRoad(stub, args)
+	case "readRoad":
+		return t.readRoad(stub, args)
+	case "deleteRoad":
+		return t.deleteRoad(stub, args)
+	case "inRoad":
+		return t.inRoad(stub, args)
+	case "updataRGL":
+		return t.updataRGL(stub, args)
+	case "readRGL":
+		return t.readRgl(stub, args)
+	case "deleteRGL":
+		return t.dealRGL(stub, args)
+	case "getHistoryRGL": //debug
+		return t.getHistryRgl(stub, args)
 	case "test":
 		return t.testChaincode(stub, args)
 	case "testQ":
