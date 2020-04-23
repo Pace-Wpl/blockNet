@@ -226,6 +226,31 @@ func (t *BlockCarCC) readCar(stub shim.ChaincodeStubInterface, args []string) pe
 	return shim.Success(resp)
 }
 
+//根据carnum查询汽车动态信息;
+//args:carnum
+func (t *BlockCarCC) carState(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	carNum := args[0]
+
+	carDyAsBytes, err := stub.GetState(carNum)
+	if err != nil {
+		return shim.Error(err.Error())
+	} else if carDyAsBytes == nil {
+		return shim.Error("car 信息不存在！")
+	}
+
+	carDy := &def.CarDy{}
+	if err = json.Unmarshal(carDyAsBytes, carDy); err != nil {
+		return shim.Error(err.Error())
+	}
+
+	resp, err := json.Marshal(carDy)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(resp)
+}
+
 //上锁;
 //args:json carDyReq
 func (t *BlockCarCC) lockCar(stub shim.ChaincodeStubInterface, args []string) peer.Response {
@@ -301,7 +326,7 @@ func (t *BlockCarCC) getHistoryForCar(stub shim.ChaincodeStubInterface, args []s
 }
 
 //删除车辆信息;
-//args: 信息id
+//args: 信息id,event id
 func (t *BlockCarCC) deleteCar(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	carId := args[0]
@@ -324,6 +349,11 @@ func (t *BlockCarCC) deleteCar(stub shim.ChaincodeStubInterface, args []string) 
 	}
 
 	err = stub.DelState(carId) // 删除静态信息
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	err = stub.SetEvent(args[1], []byte{}) //set event init
 	if err != nil {
 		return shim.Error(err.Error())
 	}

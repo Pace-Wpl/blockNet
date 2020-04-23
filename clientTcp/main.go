@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -12,13 +13,50 @@ import (
 )
 
 //消息处理
-func register(conn *net.TCPConn, msg string) {
-	com := strings.Split(msg, ";")
+func tcpHandle(conn *net.TCPConn, msg string) {
+	com := strings.Split(msg, ",")
 	switch com[0] {
+	case "initCar":
+		initCar(conn, com[1:])
 	case "getCar":
 		GetCar(conn, com[1:])
+	case "getState":
+		GetState(conn, com[1:])
+	case "putCarDy":
+		PutCarDy(conn, com[1:])
+	case "lockCar":
+		LockCar(conn, com[1:])
+	case "unlock":
+		return t.unLockCar(stub, args)
+	case "queryCarByOwner":
+		QueryCarByOwner(conn, com[1:])
+	case "queryCarHistry":
+		QueryCarHistry(conn, com[1:])
+	case "deleteCar":
+		return t.deleteCar(stub, args)
+	case "checkRGL":
+		return t.checkRGL(stub, args)
+	case "updataCar":
+		return t.updataCar(stub, args)
+	case "updataRoad":
+		return t.updataRoad(stub, args)
+	case "readRoad":
+		return t.readRoad(stub, args)
+	case "deleteRoad":
+		return t.deleteRoad(stub, args)
+	case "onRoad":
+		return t.onRoad(stub, args)
+	case "updataRGL":
+		return t.updataRGL(stub, args)
+	case "readRGL":
+		return t.readRgl(stub, args)
+	case "deleteRGL":
+		return t.dealRGL(stub, args)
+	case "getHistoryRGL":
+		return t.getHistryRgl(stub, args)
+	default:
 	}
-
+	sendErrorResponse(conn, errors.New("没有相应的方法！"))
 }
 
 func main() {
@@ -43,14 +81,14 @@ func main() {
 			continue
 		} else {
 			fmt.Println([]byte("connecte and server!"))
-			go tcpHandle(tcpConn)
+			go register(tcpConn)
 		}
 
 	}
 }
 
 //处理连接
-func tcpHandle(conn *net.TCPConn) {
+func register(conn *net.TCPConn) {
 	ipStr := conn.RemoteAddr().String()
 
 	defer func() {
@@ -64,6 +102,6 @@ func tcpHandle(conn *net.TCPConn) {
 		if err != nil || err == io.EOF || message == "END" {
 			break
 		}
-		register(conn, string(message))
+		tcpHandle(conn, string(message))
 	}
 }

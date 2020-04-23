@@ -22,6 +22,8 @@ func (t *BlockCarCC) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.initCar(stub, args)
 	case "readCar":
 		return t.readCar(stub, args)
+	case "carState":
+		return t.carState(stub, args)
 	case "lock":
 		return t.lockCar(stub, args)
 	case "unlock":
@@ -44,8 +46,8 @@ func (t *BlockCarCC) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.readRoad(stub, args)
 	case "deleteRoad":
 		return t.deleteRoad(stub, args)
-	case "inRoad":
-		return t.inRoad(stub, args)
+	case "onRoad":
+		return t.onRoad(stub, args)
 	case "updataRGL":
 		return t.updataRGL(stub, args)
 	case "readRGL":

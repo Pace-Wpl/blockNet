@@ -65,6 +65,11 @@ func (t *BlockCarCC) deleteRoad(stub shim.ChaincodeStubInterface, args []string)
 		return shim.Error(err.Error())
 	}
 
+	err = stub.SetEvent(args[1], []byte{}) //set event init
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
 	return shim.Success(nil)
 }
 
@@ -97,7 +102,7 @@ func (t *BlockCarCC) readRoad(stub shim.ChaincodeStubInterface, args []string) p
 
 //在路上,汽车传输正在行使的道路信息
 //args: road code, car number,
-func (t *BlockCarCC) inRoad(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+func (t *BlockCarCC) onRoad(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 	rc := args[0]
 	carNum := args[1]
 
@@ -115,7 +120,7 @@ func (t *BlockCarCC) inRoad(stub shim.ChaincodeStubInterface, args []string) pee
 
 	switch roadInfo.Tag {
 	case 1:
-		err := stub.SetEvent(carNum+",inRoad", []byte("tag:1"))
+		err := stub.SetEvent(carNum+",onRoad", []byte("tag:1"))
 		if err != nil {
 			return shim.Error(err.Error())
 		}
@@ -220,7 +225,7 @@ func (t *BlockCarCC) updataRGL(stub shim.ChaincodeStubInterface, args []string) 
 }
 
 //处理消除违法信息;
-//args: RGL ID,
+//args: RGL ID, event id
 func (t *BlockCarCC) dealRGL(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	rgl := args[0]
@@ -233,6 +238,11 @@ func (t *BlockCarCC) dealRGL(stub shim.ChaincodeStubInterface, args []string) pe
 	}
 
 	err = stub.DelState(rgl) // 删除信息
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	err = stub.SetEvent(args[1], []byte{}) //set event init
 	if err != nil {
 		return shim.Error(err.Error())
 	}
