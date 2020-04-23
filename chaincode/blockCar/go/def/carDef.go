@@ -21,6 +21,14 @@ type CarInfomation struct {
 	Colour     string `json:"carColour"` // 车颜色
 }
 
+//历史信息
+type CarHistry struct {
+	Txid      string `json:"Txid"`
+	Timestamp string `json:"timestamp"`
+	IsDelete  bool   `json:"IsDelete"`
+	CarDy     CarDy  `json:"carDy"`
+}
+
 //request
 type CarDyReq struct {
 	CarNumber   string  `json:"carNum"`      // 车牌号
@@ -44,4 +52,12 @@ type CarResp struct {
 	Velocity    float32 `json:"velocity"`    //速度
 	Temperature float32 `json:"temperature"` //温度
 	FaultCode   string  `json:"faultCode"`   // 故障码
+}
+
+type OwenrCarItem struct {
+	Item []CarInfomation `json:"item"`
+}
+
+type HistryItem struct {
+	Item []CarHistry `json:"item"`
 }

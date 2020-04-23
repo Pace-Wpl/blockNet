@@ -267,27 +267,49 @@ func (t *BlockCarCC) readRgl(stub shim.ChaincodeStubInterface, args []string) pe
 }
 
 //根据车牌查询违法信息记录
-//args: carNum,
+//args: rgl code  ,
 func (t *BlockCarCC) getHistryRgl(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
-	rgl := args[0]
+	rglC := args[0]
 
-	rglInfoAsBytes, err := stub.GetState(rgl)
-	if err != nil {
-		return shim.Error(err.Error())
-	} else if rglInfoAsBytes == nil {
-		return shim.Error(" 信息不存在！")
-	}
-
-	rglInfo := &def.RegulationsInfo{}
-	if err = json.Unmarshal(rglInfoAsBytes, rglInfo); err != nil {
-		return shim.Error(err.Error())
-	}
-
-	resp, err := json.Marshal(rglInfo)
+	resultIterator, err := stub.GetHistoryForKey(rglC)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
+	defer resultIterator.Close()
 
-	return shim.Success(resp)
+	var hsItem []def.HistryRGL
+	var rgl def.RegulationsInfo
+	for resultIterator.HasNext() {
+		queryResponse, err := resultIterator.Next()
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		var hItem def.HistryRGL
+		hItem.Txid = queryResponse.TxId
+		hItem.IsDelete = queryResponse.IsDelete
+		hItem.Timestamp = time.Unix(queryResponse.Timestamp.Seconds, int64(queryResponse.Timestamp.Nanos)).String()
+
+		if err = json.Unmarshal(queryResponse.Value, &rgl); err != nil {
+			return shim.Error(err.Error())
+		}
+		if queryResponse.Value == nil {
+			var empty def.RegulationsInfo
+			hItem.Rgl = empty
+		} else {
+			hItem.Rgl = rgl
+		}
+
+		hsItem = append(hsItem, hItem)
+
+	}
+
+	hstt := def.HistryRGLItem{Item: hsItem}
+	hsAsJSON, err := json.Marshal(hstt)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(hsAsJSON)
 }

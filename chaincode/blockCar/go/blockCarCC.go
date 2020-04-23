@@ -1,10 +1,8 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/blockNet/chaincode/blockCar/go/def"
@@ -149,7 +147,7 @@ func (t *BlockCarCC) putCarDy(stub shim.ChaincodeStubInterface, args []string) p
 }
 
 //通过所有者查询car;
-//args: 所有者
+//args: owner
 func (t *BlockCarCC) queryCarByOwner(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	owner := args[0]
@@ -159,34 +157,30 @@ func (t *BlockCarCC) queryCarByOwner(stub shim.ChaincodeStubInterface, args []st
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-
 	defer resultIterator.Close()
 
-	var buffer bytes.Buffer
-	buffer.WriteString("[")
-
-	isWrite := false
-
+	var carItem []def.CarInfomation
+	var car *def.CarInfomation
 	for resultIterator.HasNext() {
 		queryResponse, err := resultIterator.Next()
 		if err != nil {
 			return shim.Error(err.Error())
 		}
 
-		if isWrite == true {
-			buffer.WriteString(",")
+		if err := json.Unmarshal(queryResponse.Value, car); err != nil {
+			return shim.Error(err.Error())
+		} else {
+			carItem = append(carItem, *car)
 		}
-
-		buffer.WriteString("{\"key\":")
-		buffer.WriteString(queryResponse.Key)
-		buffer.WriteString(",\"record\": ")
-		buffer.WriteString(string(queryResponse.Value))
-		buffer.WriteString("}")
-		isWrite = true
 	}
-	buffer.WriteString("]")
 
-	return shim.Success(buffer.Bytes())
+	resp := &def.OwenrCarItem{Item: carItem}
+	carItemAsBytes, err := json.Marshal(resp)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(carItemAsBytes)
 }
 
 //根据信息id查询car;
@@ -265,48 +259,45 @@ func (t *BlockCarCC) getHistoryForCar(stub shim.ChaincodeStubInterface, args []s
 	carNum := args[0]
 
 	resultIterator, err := stub.GetHistoryForKey(carNum)
-
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-
 	defer resultIterator.Close()
 
-	var buffer bytes.Buffer
-
-	buffer.WriteString("[")
-
-	isWrite := false
+	var hsItem []def.CarHistry
+	var cDy def.CarDy
 	for resultIterator.HasNext() {
 		queryResponse, err := resultIterator.Next()
-
 		if err != nil {
 			return shim.Error(err.Error())
 		}
 
-		if isWrite == true {
-			buffer.WriteString(",")
+		var hItem def.CarHistry
+		hItem.Txid = queryResponse.TxId
+		hItem.IsDelete = queryResponse.IsDelete
+		hItem.Timestamp = time.Unix(queryResponse.Timestamp.Seconds, int64(queryResponse.Timestamp.Nanos)).String()
+
+		if err = json.Unmarshal(queryResponse.Value, &cDy); err != nil {
+			return shim.Error(err.Error())
+		}
+		if queryResponse.Value == nil {
+			var empty def.CarDy
+			hItem.CarDy = empty
+		} else {
+			hItem.CarDy = cDy
 		}
 
-		buffer.WriteString("{ \"TxId\":")
-		buffer.WriteString(queryResponse.TxId)
+		hsItem = append(hsItem, hItem)
 
-		buffer.WriteString(",\"Timestamp\": ")
-		buffer.WriteString(time.Unix(queryResponse.Timestamp.Seconds, int64(queryResponse.Timestamp.Nanos)).String())
-
-		buffer.WriteString(",\"Value\": ")
-		buffer.WriteString(string(queryResponse.Value))
-
-		buffer.WriteString(",\"IsDelete\": ")
-		buffer.WriteString(strconv.FormatBool(queryResponse.IsDelete))
-		buffer.WriteString("}")
-
-		isWrite = true
 	}
 
-	buffer.WriteString("]")
+	hstt := def.HistryItem{Item: hsItem}
+	hsAsJSON, err := json.Marshal(hstt)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
 
-	return shim.Success(buffer.Bytes())
+	return shim.Success(hsAsJSON)
 }
 
 //删除车辆信息;
