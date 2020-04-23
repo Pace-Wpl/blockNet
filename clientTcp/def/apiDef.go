@@ -9,6 +9,7 @@ const (
 	CHAINNEL_ID     = "mychannel"
 	LOCK_EVENT      = ",islock"
 	FAULTCODE_EVENT = ",faultcode"
+	RGL_EVENT_SPPED = ",speedLimit"
 )
 
 type InitInfo struct {

@@ -377,3 +377,15 @@ func GetHistoryRGL(rglId string) ([]byte, error) {
 
 	return resp.Payload, nil
 }
+
+func LockCheck(carNum string) {
+
+}
+
+func FaulCheck(carNum string) {
+
+}
+
+func RglCheck(carNum string) {
+
+}
