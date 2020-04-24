@@ -135,6 +135,9 @@ func (t *BlockCarCC) onRoad(stub shim.ChaincodeStubInterface, args []string) pee
 //args:json CheckRGL,
 func (t *BlockCarCC) checkRGL(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 	c := &def.CheckRGL{}
+	if err := json.Unmarshal([]byte(args[0]), c); err != nil {
+		return shim.Error(err.Error())
+	}
 
 	roadAsByte, err := stub.GetState(c.Road)
 	if err != nil {
@@ -152,17 +155,19 @@ func (t *BlockCarCC) checkRGL(stub shim.ChaincodeStubInterface, args []string) p
 			return shim.Error(err.Error())
 		}
 
+		id := func(len int) string { //5 位随即字符串
+			bytes := make([]byte, len)
+			for i := 0; i < len; i++ {
+				c := int64(i)
+				b := rand.New(rand.NewSource(time.Now().Unix()+c)).Intn(26) + 65
+				bytes[i] = byte(b)
+			}
+			return string(bytes)
+		}(5)
 		rglInfo := &def.RegulationsInfo{
 			ObjectType: "RegulationsInfo",
-			ID: func(len int) string { //5 位随即字符串
-				bytes := make([]byte, len)
-				for i := 0; i < len; i++ {
-					b := rand.New(rand.NewSource(time.Now().Unix())).Intn(26) + 65
-					bytes[i] = byte(b)
-				}
-				return string(bytes)
-			}(5),
-			CarNumber: c.CarNumber, Road: c.Road, Type: "speeding", Mes: "speeding in the road :" + roadInfo.Name + "!",
+			ID:         id,
+			CarNumber:  c.CarNumber, Road: c.Road, Type: "speeding", Mes: "speeding in the road :" + roadInfo.Name + "! RGL id :" + id,
 		}
 
 		rglAsBytes, err := json.Marshal(rglInfo)
@@ -282,7 +287,8 @@ func (t *BlockCarCC) readRgl(stub shim.ChaincodeStubInterface, args []string) pe
 func (t *BlockCarCC) carRgl(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	carNum := args[0]
-	queryStr := fmt.Sprintf("{\"selector\":{\"carNumber\":\"%s\"}}", carNum)
+	objType := "RegulationsInfo"
+	queryStr := fmt.Sprintf("{\"selector\":{\"objectType\":\"%s\",\"carNumber\":\"%s\"}}", objType, carNum)
 
 	resultIterator, err := stub.GetQueryResult(queryStr)
 	if err != nil {

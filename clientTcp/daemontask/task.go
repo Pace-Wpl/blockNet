@@ -23,7 +23,7 @@ func (t *Task) eventResult(notifier <-chan *fab.CCEvent) bool {
 		fmt.Printf("接收到链码事件: %v\n", ccEvent)
 		return true
 	case e := <-t.Controller:
-		fmt.Println("收到结束码:%s,正在结束...\n", e)
+		fmt.Println("收到结束码:%s,监听正在结束...\n", e)
 		return false
 	}
 }
@@ -32,8 +32,13 @@ func regitserEvent(client *ch.Client, chaincodeID, eventID string) (fab.Registra
 
 	reg, notifier, err := client.RegisterChaincodeEvent(chaincodeID, eventID)
 	if err != nil {
-		fmt.Printf("注册链码事件失败: %s", err)
+		fmt.Println("注册监听失败,请重新开启...")
+		// fmt.Println("注册监听失败,请重新开启...")
+		// client.UnregisterChaincodeEvent(reg)
+		// time.Sleep(time.Duration(10) * time.Second)
+		// reg, notifier = regitserEvent(client, chaincodeID, eventID)
 	}
+	// fmt.Println("正在监听...")
 	return reg, notifier
 }
 

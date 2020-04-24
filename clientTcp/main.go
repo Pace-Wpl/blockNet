@@ -8,6 +8,7 @@ import (
 	"net"
 	"strconv"
 	"strings"
+	"time"
 
 	ds "github.com/blockNet/clientTcp/daemontask"
 	"github.com/blockNet/clientTcp/def"
@@ -30,7 +31,7 @@ func tcpHandle(conn *net.TCPConn, com []string) {
 		unLockCar(conn, com[1:])
 	case "queryCarByOwner":
 		queryCarByOwner(conn, com[1:])
-	case "queryCarHistry":
+	case "queryCarHistory":
 		queryCarHistry(conn, com[1:])
 	case "deleteCar":
 		deleteCar(conn, com[1:])
@@ -40,7 +41,7 @@ func tcpHandle(conn *net.TCPConn, com []string) {
 		updataCar(conn, com[1:])
 	case "updataRoad":
 		updataRoad(conn, com[1:])
-	case "readRoad":
+	case "getRoad":
 		getRoad(conn, com[1:])
 	case "deleteRoad":
 		deleteRoad(conn, com[1:])
@@ -48,14 +49,18 @@ func tcpHandle(conn *net.TCPConn, com []string) {
 		onRoad(conn, com[1:])
 	case "updataRGL":
 		updataRGL(conn, com[1:])
-	case "readRGL":
+	case "getRGL":
 		getRGL(conn, com[1:])
 	case "carRGL":
 		carRGL(conn, com[1:])
 	case "deleteRGL":
 		dealRGL(conn, com[1:])
-	case "getHistoryRGL":
+	case "queryHistoryRGL":
 		getHistoryRGL(conn, com[1:])
+	case "TASK":
+		sendNormalResponse(conn, []byte("监听开启..."))
+	case "RESTART_TASK":
+		sendNormalResponse(conn, []byte("监听重启..."))
 	default:
 		sendErrorResponse(conn, errors.New("没有相应的方法！"))
 	}
@@ -114,11 +119,14 @@ func register(conn *net.TCPConn) {
 			break
 		} else if com[0] == "TASK" {
 			task := com[1]
-			if err != nil || err == io.EOF || task == "EXIT" {
-				break
-			}
+			t.StartDaemon(task)
+		} else if com[0] == "RESTART_TASK" {
+			task := com[1]
+			t.StopDaemon()
+			time.Sleep(time.Duration(3) * time.Second)
 			t.StartDaemon(task)
 		}
+
 		tcpHandle(conn, com)
 	}
 }

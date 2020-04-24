@@ -151,7 +151,8 @@ func (t *BlockCarCC) putCarDy(stub shim.ChaincodeStubInterface, args []string) p
 func (t *BlockCarCC) queryCarByOwner(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	owner := args[0]
-	queryStr := fmt.Sprintf("{\"selector\":{\"owner\":\"%s\"}}", owner)
+	objType := "carInfomation"
+	queryStr := fmt.Sprintf("{\"selector\":{\"objectType\":\"%s\",\"owner\":\"%s\"}}", objType, owner)
 
 	resultIterator, err := stub.GetQueryResult(queryStr)
 	if err != nil {
