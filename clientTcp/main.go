@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	ds "github.com/blockNet/clientTcp/daemontask"
 	"github.com/blockNet/clientTcp/def"
 )
 
@@ -91,7 +92,11 @@ func main() {
 func register(conn *net.TCPConn) {
 	ipStr := conn.RemoteAddr().String()
 
+	c := make(chan string)
+	t := &ds.Task{Controller: c, Conn: conn}
+
 	defer func() {
+		t.StopDaemon()
 		fmt.Println(" Disconnected : " + ipStr)
 		conn.Close()
 	}()
@@ -101,6 +106,12 @@ func register(conn *net.TCPConn) {
 		message, err := reader.ReadString('\n')
 		if err != nil || err == io.EOF || message == "END" {
 			break
+		} else if message == "TASK" {
+			task, err := reader.ReadString('\n')
+			if err != nil || err == io.EOF || task == "END" {
+				break
+			}
+			t.StartDaemon(task)
 		}
 		tcpHandle(conn, string(message))
 	}

@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"log"
+	"net"
 
 	"github.com/blockNet/clientTcp/def"
 	"github.com/blockNet/clientTcp/utils"
@@ -378,14 +379,60 @@ func GetHistoryRGL(rglId string) ([]byte, error) {
 	return resp.Payload, nil
 }
 
-func LockCheck(carNum string) {
+func CarRGL(carNum string) ([]byte, error) {
+	req := channel.Request{ChaincodeID: ServiceClient.ChaincodeID, Fcn: "carRGL", Args: [][]byte{[]byte(carNum)}}
+	resp, err := ServiceClient.Client.Query(req)
+	if err != nil {
+		return []byte{}, err
+	}
 
+	return resp.Payload, nil
 }
 
-func FaulCheck(carNum string) {
+//锁监听
+func LockCheck(carNum string, conn *net.TCPConn) {
+	resp, err := GetState(carNum)
+	carDy := &def.CarDy{}
 
+	if err = json.Unmarshal(resp, carDy); err != nil {
+		log.Printf("监听 unmarshal errror :%s\n", err)
+	}
+
+	if carDy.Lock {
+		sendTips(conn, "car was locked!\n")
+	} else {
+		sendTips(conn, "car was opened!\n")
+	}
 }
 
-func RglCheck(carNum string) {
+//错误码监听
+func FaulCheck(carNum string, conn *net.TCPConn) {
+	resp, err := GetState(carNum)
+	carDy := &def.CarDy{}
 
+	if err = json.Unmarshal(resp, carDy); err != nil {
+		log.Printf("监听 unmarshal errror :%s\n", err)
+	}
+
+	if carDy.FaultCode != "" {
+		sendTips(conn, "has a fault code :"+carDy.FaultCode+"!\n")
+	}
+}
+
+//违章监听
+func RglCheck(carNum string, conn *net.TCPConn) {
+	resp, err := CarRGL(carNum)
+	rglInfoItem := &def.CarRGLItem{}
+
+	if err = json.Unmarshal(resp, rglInfoItem); err != nil {
+		log.Printf("监听 unmarshal errror :%s\n", err)
+	}
+
+	if rglInfoItem != nil {
+		sendTips(conn, "has a Regulations info :"+rglInfoItem.Item[0].Mes+"!\n")
+	}
+}
+
+func sendTips(conn *net.TCPConn, message string) {
+	conn.Write([]byte(message))
 }

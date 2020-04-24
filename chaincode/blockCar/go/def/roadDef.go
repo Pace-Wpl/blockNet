@@ -40,3 +40,8 @@ type HistryRGL struct {
 type HistryRGLItem struct {
 	Item []HistryRGL `json:"item"`
 }
+
+//response
+type CarRGLItem struct {
+	Item []RegulationsInfo `json:"item"`
+}

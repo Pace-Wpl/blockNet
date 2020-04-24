@@ -36,6 +36,10 @@ type HistryItem struct {
 	Item []CarHistry `json:"item"`
 }
 
+type CarRGLItem struct {
+	Item []RegulationsInfo `json:"item"`
+}
+
 //request
 type CheckRGL struct {
 	CarNumber string  `json:"carNumber"` // 车牌号

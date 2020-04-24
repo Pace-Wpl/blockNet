@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -274,6 +275,42 @@ func (t *BlockCarCC) readRgl(stub shim.ChaincodeStubInterface, args []string) pe
 	}
 
 	return shim.Success(resp)
+}
+
+//通过carNum查询rgl;
+//args: carNum
+func (t *BlockCarCC) carRgl(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+
+	carNum := args[0]
+	queryStr := fmt.Sprintf("{\"selector\":{\"carNumber\":\"%s\"}}", carNum)
+
+	resultIterator, err := stub.GetQueryResult(queryStr)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	defer resultIterator.Close()
+
+	var rglItem []def.RegulationsInfo
+	var rgl def.RegulationsInfo
+	for resultIterator.HasNext() {
+		queryResponse, err := resultIterator.Next()
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		if err := json.Unmarshal(queryResponse.Value, &rgl); err != nil {
+			return shim.Error(err.Error())
+		} else {
+			rglItem = append(rglItem, rgl)
+		}
+	}
+	resp := &def.CarRGLItem{Item: rglItem}
+	rglItemAsBytes, err := json.Marshal(resp)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(rglItemAsBytes)
 }
 
 //根据车牌查询违法信息记录
