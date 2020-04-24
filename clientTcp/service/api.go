@@ -434,5 +434,5 @@ func RglCheck(carNum string, conn *net.TCPConn) {
 }
 
 func sendTips(conn *net.TCPConn, message string) {
-	conn.Write([]byte(message))
+	conn.Write([]byte(message + "\n"))
 }

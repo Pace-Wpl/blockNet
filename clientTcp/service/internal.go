@@ -27,10 +27,10 @@ func eventResult(notifier <-chan *fab.CCEvent, eventID string) (string, error) {
 		if bytes.Equal(ccEvent.Payload, []byte{}) {
 			return "Successful!", nil
 		} else {
-			return string(ccEvent.Payload), nil
+			return string(ccEvent.Payload) + "11", nil
 		}
 	case <-time.After(time.Second * 20):
 		fmt.Errorf("不能根据指定的事件ID接收到相应的链码事件(%s)", eventID)
-		return "不能根据指定的事件ID接收到相应的链码事件(" + eventID + ")", nil
+		return "不能根据指定的事件ID接收到相应的链码事件(" + eventID + ")\n", nil
 	}
 }

@@ -14,8 +14,7 @@ import (
 )
 
 //消息处理
-func tcpHandle(conn *net.TCPConn, msg string) {
-	com := strings.Split(msg, ",")
+func tcpHandle(conn *net.TCPConn, com []string) {
 	switch com[0] {
 	case "initCar":
 		initCar(conn, com[1:])
@@ -51,13 +50,15 @@ func tcpHandle(conn *net.TCPConn, msg string) {
 		updataRGL(conn, com[1:])
 	case "readRGL":
 		getRGL(conn, com[1:])
+	case "carRGL":
+		carRGL(conn, com[1:])
 	case "deleteRGL":
 		dealRGL(conn, com[1:])
 	case "getHistoryRGL":
 		getHistoryRGL(conn, com[1:])
 	default:
+		sendErrorResponse(conn, errors.New("没有相应的方法！"))
 	}
-	sendErrorResponse(conn, errors.New("没有相应的方法！"))
 }
 
 func main() {
@@ -78,10 +79,10 @@ func main() {
 
 		fmt.Println("A client connected :" + tcpConn.RemoteAddr().String())
 		if strings.Split(tcpConn.RemoteAddr().String(), ":")[0] != "127.0.0.1" {
-			fmt.Println([]byte("bad request."))
+			fmt.Println("bad request.")
 			continue
 		} else {
-			fmt.Println([]byte("connecte and server!"))
+			fmt.Println("connecte and server!")
 			go register(tcpConn)
 		}
 
@@ -92,6 +93,7 @@ func main() {
 func register(conn *net.TCPConn) {
 	ipStr := conn.RemoteAddr().String()
 
+	conn.Write([]byte("connect successful!\n"))
 	c := make(chan string)
 	t := &ds.Task{Controller: c, Conn: conn}
 
@@ -104,15 +106,19 @@ func register(conn *net.TCPConn) {
 	reader := bufio.NewReader(conn)
 	for {
 		message, err := reader.ReadString('\n')
-		if err != nil || err == io.EOF || message == "END" {
+		com := strings.Split(message, ",")
+		fmt.Println("com0:" + com[0])
+		if err != nil || err == io.EOF || com[0] == "EXIT" {
+			fmt.Println("exit and send exit")
+			conn.Write([]byte("EXIT"))
 			break
-		} else if message == "TASK" {
-			task, err := reader.ReadString('\n')
-			if err != nil || err == io.EOF || task == "END" {
+		} else if com[0] == "TASK" {
+			task := com[1]
+			if err != nil || err == io.EOF || task == "EXIT" {
 				break
 			}
 			t.StartDaemon(task)
 		}
-		tcpHandle(conn, string(message))
+		tcpHandle(conn, com)
 	}
 }

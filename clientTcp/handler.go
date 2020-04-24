@@ -69,7 +69,7 @@ func initCar(conn *net.TCPConn, msgs []string) {
 //request args:car id
 func getCar(conn *net.TCPConn, args []string) {
 	carNum := args[0]
-
+	fmt.Println(carNum)
 	car, err := service.GetCar(carNum)
 	if err != nil {
 		sendErrorResponse(conn, err)
@@ -378,6 +378,19 @@ func getHistoryRGL(conn *net.TCPConn, args []string) {
 	rglId := args[0]
 
 	resp, err := service.GetHistoryRGL(rglId)
+	if err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	sendNormalResponse(conn, resp)
+}
+
+//request: carnum
+func carRGL(conn *net.TCPConn, args []string) {
+	carNum := args[0]
+
+	resp, err := service.CarRGL(carNum)
 	if err != nil {
 		sendErrorResponse(conn, err)
 		return

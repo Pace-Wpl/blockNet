@@ -14,6 +14,7 @@ import (
 type Task struct {
 	Controller chan string
 	Conn       *net.TCPConn
+	Flag       bool
 }
 
 func (t *Task) eventResult(notifier <-chan *fab.CCEvent) bool {
@@ -60,6 +61,7 @@ func (t *Task) ListenTask(event string, CarNum string) {
 
 //开启监听
 func (t *Task) StartDaemon(CarNum string) {
+	t.Flag = true
 	go t.ListenTask(def.FAULTCODE_EVENT, CarNum)
 	go t.ListenTask(def.LOCK_EVENT, CarNum)
 	go t.ListenTask(def.RGL_EVENT_SPPED, CarNum)
@@ -67,10 +69,12 @@ func (t *Task) StartDaemon(CarNum string) {
 
 //停止监听
 func (t *Task) StopDaemon() {
-	t.Controller <- "done1"
-	time.Sleep(time.Duration(2) * time.Second)
-	t.Controller <- "done2"
-	time.Sleep(time.Duration(2) * time.Second)
-	t.Controller <- "done3"
-	time.Sleep(time.Duration(2) * time.Second)
+	if t.Flag {
+		t.Controller <- "done1"
+		time.Sleep(time.Duration(2) * time.Second)
+		t.Controller <- "done2"
+		time.Sleep(time.Duration(2) * time.Second)
+		t.Controller <- "done3"
+		time.Sleep(time.Duration(2) * time.Second)
+	}
 }
