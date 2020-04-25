@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -376,12 +377,26 @@ func faultHandle(stub shim.ChaincodeStubInterface, carDy *def.CarDyReq) error {
 	return nil
 }
 
-//更新汽车动态信息
+//更新锁车动态信息
 func putCar(stub shim.ChaincodeStubInterface, args []string) (string, error) {
 	carDyReq := &def.CarDyReq{}
 	if err := json.Unmarshal([]byte(args[0]), carDyReq); err != nil {
 		return "", err
 	}
+
+	carDyAsBytes, err := stub.GetState(carDyReq.CarNumber)
+	if err != nil {
+		return "", err
+	} else if carDyAsBytes == nil {
+		return "", errors.New("信息不纯在")
+	}
+
+	carDy := &def.CarDy{}
+	if err = json.Unmarshal(carDyAsBytes, carDy); err != nil {
+		return "", err
+	}
+
+	carDy.Lock = carDyReq.Lock
 
 	//判断 carNum 是否存在
 	// carDyAsBytes, err := stub.GetState(carDyReq.CarNumber)
@@ -392,8 +407,7 @@ func putCar(stub shim.ChaincodeStubInterface, args []string) (string, error) {
 	// 	return shim.Error("car  不存在！")
 	// }
 
-	CarDy := &def.CarDy{ObjectType: "carDy", Lock: carDyReq.Lock, Commander: carDyReq.Commander, Velocity: carDyReq.Velocity, Temperature: carDyReq.Temperature, FaultCode: carDyReq.FaultCode}
-	CarDyJSON, err := json.Marshal(CarDy)
+	CarDyJSON, err := json.Marshal(carDy)
 	if err != nil {
 		return "", err
 	}
