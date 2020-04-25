@@ -200,13 +200,13 @@ func queryCarByOwner(conn *net.TCPConn, args []string) {
 
 	var buffer bytes.Buffer
 	isWrite := false
-	for d, v := range carItem.Item {
+	for _, v := range carItem.Item {
 		v1, _ := json.Marshal(v)
 		if !isWrite {
 			buffer.WriteString(v.Owner + ":\n")
 			isWrite = true
 		}
-		buffer.WriteString("iteam" + string(d) + ":")
+		buffer.WriteString("iteam:")
 		buffer.Write(v1)
 		buffer.WriteString(";\n")
 	}
@@ -232,13 +232,13 @@ func queryCarHistry(conn *net.TCPConn, args []string) {
 
 	var buffer bytes.Buffer
 	isWrite := false
-	for d, v := range hisItem.Item {
+	for _, v := range hisItem.Item {
 		v1, _ := json.Marshal(v.CarDy)
 		if !isWrite {
 			buffer.WriteString(carNum + ":\n")
 			isWrite = true
 		}
-		buffer.WriteString("iteam" + string(d) + ":")
+		buffer.WriteString("iteam:")
 		buffer.WriteString("Timestamp:" + v.Timestamp + ";")
 		buffer.WriteString("IsDelete:" + strconv.FormatBool(v.IsDelete) + ";")
 		buffer.Write(v1)
@@ -442,13 +442,13 @@ func getHistoryRGL(conn *net.TCPConn, args []string) {
 
 	var buffer bytes.Buffer
 	isWrite := false
-	for d, v := range hisItem.Item {
+	for _, v := range hisItem.Item {
 		v1, _ := json.Marshal(v.Rgl)
 		if !isWrite {
 			buffer.WriteString(rglId + ":\n")
 			isWrite = true
 		}
-		buffer.WriteString("iteam" + string(d) + ":")
+		buffer.WriteString("iteam:")
 		buffer.WriteString("Timestamp:" + v.Timestamp + ";")
 		buffer.WriteString("IsDelete:" + strconv.FormatBool(v.IsDelete) + ";")
 		buffer.Write(v1)
@@ -477,13 +477,13 @@ func carRGL(conn *net.TCPConn, args []string) {
 
 	var buffer bytes.Buffer
 	isWrite := false
-	for d, v := range rglItem.Item {
+	for _, v := range rglItem.Item {
 		v1, _ := json.Marshal(v)
 		if !isWrite {
 			buffer.WriteString(carNum + ":\n")
 			isWrite = true
 		}
-		buffer.WriteString("iteam" + string(d) + ":")
+		buffer.WriteString("iteam:")
 		buffer.Write(v1)
 		buffer.WriteString(";\n")
 	}
