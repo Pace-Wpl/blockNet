@@ -433,6 +433,12 @@ func RglCheck(carNum string, conn *net.TCPConn) {
 	}
 }
 
+//onRoad listen
+func OnRoadListen(carNum string, conn *net.TCPConn) {
+	// CheckRGL(cGRL *def.CheckRGL)
+	sendTips(conn, "on the tag 1 road!")
+}
+
 func sendTips(conn *net.TCPConn, message string) {
 	conn.Write([]byte(message + "\n"))
 }

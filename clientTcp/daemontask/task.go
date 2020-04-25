@@ -54,6 +54,8 @@ func (t *Task) ListenTask(event string, CarNum string) {
 				service.FaulCheck(CarNum, t.Conn)
 			case def.RGL_EVENT_SPPED:
 				service.RglCheck(CarNum, t.Conn)
+			case def.ON_ROAD_EVENT:
+				service.OnRoadListen(CarNum, t.Conn)
 			}
 		} else {
 			service.ServiceClient.Client.UnregisterChaincodeEvent(reg)
@@ -70,6 +72,7 @@ func (t *Task) StartDaemon(CarNum string) {
 	go t.ListenTask(def.FAULTCODE_EVENT, CarNum)
 	go t.ListenTask(def.LOCK_EVENT, CarNum)
 	go t.ListenTask(def.RGL_EVENT_SPPED, CarNum)
+	go t.ListenTask(def.ON_ROAD_EVENT, CarNum)
 }
 
 //停止监听

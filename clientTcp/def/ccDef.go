@@ -67,3 +67,16 @@ type RegulationsInfo struct {
 	Type       string `json:"type"`          // 违章类型
 	Mes        string `json:"message"`       // 违章信息
 }
+
+//历史信息
+type HistryRGL struct {
+	Txid      string          `json:"Txid"`
+	Timestamp string          `json:"timestamp"`
+	IsDelete  bool            `json:"IsDelete"`
+	Rgl       RegulationsInfo `json:"rgl"`
+}
+
+//response
+type HistryRGLItem struct {
+	Item []HistryRGL `json:"item"`
+}

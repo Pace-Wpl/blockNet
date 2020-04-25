@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -200,7 +202,25 @@ func queryCarByOwner(conn *net.TCPConn, args []string) {
 		return
 	}
 
-	sendNormalResponse(conn, resp)
+	carItem := &def.OwenrCarItem{}
+	if err = json.Unmarshal(resp, carItem); err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	var buffer bytes.Buffer
+	isWrite := false
+	for _, v := range carItem.Item {
+		v1, _ := json.Marshal(v)
+		if !isWrite {
+			buffer.WriteString(v.Owner + ":\n")
+			isWrite = true
+		}
+		buffer.Write(v1)
+		buffer.WriteString(";\n")
+	}
+
+	sendNormalResponse(conn, buffer.Bytes())
 }
 
 //request: carNum
@@ -212,7 +232,27 @@ func queryCarHistry(conn *net.TCPConn, args []string) {
 		return
 	}
 
-	sendNormalResponse(conn, resp)
+	hisItem := &def.HistryItem{}
+	if err = json.Unmarshal(resp, hisItem); err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	var buffer bytes.Buffer
+	isWrite := false
+	for _, v := range hisItem.Item {
+		v1, _ := json.Marshal(v.CarDy)
+		if !isWrite {
+			buffer.WriteString(carNum + ":\n")
+			isWrite = true
+		}
+		buffer.WriteString("Timestamp:" + v.Timestamp + ";\n")
+		buffer.WriteString("IsDelete:" + strconv.FormatBool(v.IsDelete) + ";\n")
+		buffer.Write(v1)
+		buffer.WriteString(";\n")
+	}
+
+	sendNormalResponse(conn, buffer.Bytes())
 }
 
 //reuqets: carid
@@ -318,7 +358,7 @@ func deleteRoad(conn *net.TCPConn, args []string) {
 	sendNormalResponse(conn, resp)
 }
 
-//request: road code,carnum
+//request: road code,carnum,v
 func onRoad(conn *net.TCPConn, args []string) {
 	roadCode := args[0]
 	carNum := args[1]
@@ -384,7 +424,27 @@ func getHistoryRGL(conn *net.TCPConn, args []string) {
 		return
 	}
 
-	sendNormalResponse(conn, resp)
+	hisItem := &def.HistryRGLItem{}
+	if err = json.Unmarshal(resp, hisItem); err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	var buffer bytes.Buffer
+	isWrite := false
+	for _, v := range hisItem.Item {
+		v1, _ := json.Marshal(v.Rgl)
+		if !isWrite {
+			buffer.WriteString(rglId + ":\n")
+			isWrite = true
+		}
+		buffer.WriteString("Timestamp:" + v.Timestamp + ";\n")
+		buffer.WriteString("IsDelete:" + strconv.FormatBool(v.IsDelete) + ";\n")
+		buffer.Write(v1)
+		buffer.WriteString(";\n")
+	}
+
+	sendNormalResponse(conn, buffer.Bytes())
 }
 
 //request: carnum
@@ -397,5 +457,23 @@ func carRGL(conn *net.TCPConn, args []string) {
 		return
 	}
 
-	sendNormalResponse(conn, resp)
+	rglItem := &def.CarRGLItem{}
+	if err = json.Unmarshal(resp, rglItem); err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	var buffer bytes.Buffer
+	isWrite := false
+	for _, v := range rglItem.Item {
+		v1, _ := json.Marshal(v)
+		if !isWrite {
+			buffer.WriteString(carNum + ":\n")
+			isWrite = true
+		}
+		buffer.Write(v1)
+		buffer.WriteString(";\n")
+	}
+
+	sendNormalResponse(conn, buffer.Bytes())
 }

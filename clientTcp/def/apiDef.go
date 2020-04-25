@@ -10,6 +10,7 @@ const (
 	LOCK_EVENT      = ",islock"
 	FAULTCODE_EVENT = ",faultcode"
 	RGL_EVENT_SPPED = ",speedLimit"
+	ON_ROAD_EVENT   = ",onRoad"
 )
 
 type InitInfo struct {
