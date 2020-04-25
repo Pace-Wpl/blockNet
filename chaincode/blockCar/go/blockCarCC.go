@@ -310,14 +310,19 @@ func (t *BlockCarCC) getHistoryForCar(stub shim.ChaincodeStubInterface, args []s
 		hItem.IsDelete = queryResponse.IsDelete
 		hItem.Timestamp = time.Unix(queryResponse.Timestamp.Seconds, int64(queryResponse.Timestamp.Nanos)).String()
 
-		if err = json.Unmarshal(queryResponse.Value, &cDy); err != nil {
-			return shim.Error(err.Error())
-		}
-		if queryResponse.Value == nil {
+		if !hItem.IsDelete {
+			if err = json.Unmarshal(queryResponse.Value, &cDy); err != nil {
+				return shim.Error(err.Error())
+			}
+			if queryResponse.Value == nil {
+				var empty def.CarDy
+				hItem.CarDy = empty
+			} else {
+				hItem.CarDy = cDy
+			}
+		} else {
 			var empty def.CarDy
 			hItem.CarDy = empty
-		} else {
-			hItem.CarDy = cDy
 		}
 
 		hsItem = append(hsItem, hItem)

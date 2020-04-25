@@ -307,13 +307,22 @@ func DeleteRoad(roadCode string) ([]byte, error) {
 }
 
 func OnRoad(roadCode string, carNum string) ([]byte, error) {
+	eventID, _ := utils.NewUUID()
+	reg, notifier := regitserEvent(ServiceClient.Client, ServiceClient.ChaincodeID, eventID)
+	defer ServiceClient.Client.UnregisterChaincodeEvent(reg)
+
 	req := channel.Request{ChaincodeID: ServiceClient.ChaincodeID, Fcn: "onRoad", Args: [][]byte{[]byte(roadCode), []byte(carNum)}}
-	resp, err := ServiceClient.Client.Query(req)
+	_, err := ServiceClient.Client.Query(req)
 	if err != nil {
 		return []byte{}, err
 	}
 
-	return resp.Payload, nil
+	resp, err := eventResult(notifier, eventID)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return []byte(resp), nil
 }
 
 func UpdataRGL(rgl *def.RegulationsInfo) ([]byte, error) {
@@ -341,13 +350,22 @@ func UpdataRGL(rgl *def.RegulationsInfo) ([]byte, error) {
 }
 
 func GetRGL(rglId string) ([]byte, error) {
+	eventID, _ := utils.NewUUID()
+	reg, notifier := regitserEvent(ServiceClient.Client, ServiceClient.ChaincodeID, eventID)
+	defer ServiceClient.Client.UnregisterChaincodeEvent(reg)
+
 	req := channel.Request{ChaincodeID: ServiceClient.ChaincodeID, Fcn: "readRGL", Args: [][]byte{[]byte(rglId)}}
-	resp, err := ServiceClient.Client.Query(req)
+	_, err := ServiceClient.Client.Query(req)
 	if err != nil {
 		return []byte{}, err
 	}
 
-	return resp.Payload, nil
+	resp, err := eventResult(notifier, eventID)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return []byte(resp), nil
 }
 
 func DealRGL(rglId string) ([]byte, error) {
@@ -370,13 +388,22 @@ func DealRGL(rglId string) ([]byte, error) {
 }
 
 func GetHistoryRGL(rglId string) ([]byte, error) {
+	eventID, _ := utils.NewUUID()
+	reg, notifier := regitserEvent(ServiceClient.Client, ServiceClient.ChaincodeID, eventID)
+	defer ServiceClient.Client.UnregisterChaincodeEvent(reg)
+
 	req := channel.Request{ChaincodeID: ServiceClient.ChaincodeID, Fcn: "getHistoryRGL", Args: [][]byte{[]byte(rglId)}}
-	resp, err := ServiceClient.Client.Query(req)
+	_, err := ServiceClient.Client.Query(req)
 	if err != nil {
 		return []byte{}, err
 	}
 
-	return resp.Payload, nil
+	resp, err := eventResult(notifier, eventID)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return []byte(resp), nil
 }
 
 func CarRGL(carNum string) ([]byte, error) {

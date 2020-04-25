@@ -102,7 +102,7 @@ func (t *BlockCarCC) readRoad(stub shim.ChaincodeStubInterface, args []string) p
 }
 
 //在路上,汽车传输正在行使的道路信息
-//args: road code, car number,
+//args: road code, car number,event id
 func (t *BlockCarCC) onRoad(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 	rc := args[0]
 	carNum := args[1]
@@ -126,6 +126,11 @@ func (t *BlockCarCC) onRoad(stub shim.ChaincodeStubInterface, args []string) pee
 			return shim.Error(err.Error())
 		}
 	default:
+	}
+
+	err = stub.SetEvent(args[1], []byte{}) //set event init
+	if err != nil {
+		return shim.Error(err.Error())
 	}
 
 	return shim.Success(nil)
@@ -283,7 +288,7 @@ func (t *BlockCarCC) readRgl(stub shim.ChaincodeStubInterface, args []string) pe
 }
 
 //通过carNum查询rgl;
-//args: carNum
+//args: carNum,event id,
 func (t *BlockCarCC) carRgl(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	carNum := args[0]
@@ -316,6 +321,11 @@ func (t *BlockCarCC) carRgl(stub shim.ChaincodeStubInterface, args []string) pee
 		return shim.Error(err.Error())
 	}
 
+	err = stub.SetEvent(args[1], []byte{}) //set event init
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
 	return shim.Success(rglItemAsBytes)
 }
 
@@ -344,14 +354,19 @@ func (t *BlockCarCC) getHistryRgl(stub shim.ChaincodeStubInterface, args []strin
 		hItem.IsDelete = queryResponse.IsDelete
 		hItem.Timestamp = time.Unix(queryResponse.Timestamp.Seconds, int64(queryResponse.Timestamp.Nanos)).String()
 
-		if err = json.Unmarshal(queryResponse.Value, &rgl); err != nil {
-			return shim.Error(err.Error())
-		}
-		if queryResponse.Value == nil {
+		if !hItem.IsDelete {
+			if err = json.Unmarshal(queryResponse.Value, &rgl); err != nil {
+				return shim.Error(err.Error())
+			}
+			if queryResponse.Value == nil {
+				var empty def.RegulationsInfo
+				hItem.Rgl = empty
+			} else {
+				hItem.Rgl = rgl
+			}
+		} else {
 			var empty def.RegulationsInfo
 			hItem.Rgl = empty
-		} else {
-			hItem.Rgl = rgl
 		}
 
 		hsItem = append(hsItem, hItem)
