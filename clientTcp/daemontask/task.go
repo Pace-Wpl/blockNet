@@ -84,5 +84,7 @@ func (t *Task) StopDaemon() {
 		time.Sleep(time.Duration(2) * time.Second)
 		t.Controller <- "done3"
 		time.Sleep(time.Duration(2) * time.Second)
+		t.Controller <- "done4"
+		time.Sleep(time.Duration(2) * time.Second)
 	}
 }

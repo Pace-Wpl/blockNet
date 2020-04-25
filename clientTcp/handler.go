@@ -127,7 +127,7 @@ func putCarDy(conn *net.TCPConn, args []string) {
 	sendNormalResponse(conn, []byte("Successful !"))
 }
 
-//request body: carnum,lock,commander,v,t,f
+//request body: carnum,lock,commander,(v,t,f)
 func lockCar(conn *net.TCPConn, args []string) {
 	lock, err := strconv.ParseBool(args[1])
 	if err != nil {
@@ -160,7 +160,7 @@ func lockCar(conn *net.TCPConn, args []string) {
 	sendNormalResponse(conn, []byte(resp))
 }
 
-//request body: carnum,lock,commander,v,t,f
+//request body: carnum,lock,commander,(v,t,f)
 func unLockCar(conn *net.TCPConn, args []string) {
 	lock, err := strconv.ParseBool(args[1])
 	if err != nil {
@@ -168,20 +168,20 @@ func unLockCar(conn *net.TCPConn, args []string) {
 		return
 	}
 
-	v, err := strconv.ParseFloat(args[3], 32)
-	if err != nil {
-		sendErrorResponse(conn, errors.New("参数velocity,5错误！"))
-		return
-	}
+	// v, err := strconv.ParseFloat(args[3], 32)
+	// if err != nil {
+	// 	sendErrorResponse(conn, errors.New("参数velocity,5错误！"))
+	// 	return
+	// }
 
-	t, err := strconv.ParseFloat(args[4], 32)
-	if err != nil {
-		sendErrorResponse(conn, errors.New("参数Temperature,6错误！"))
-		return
-	}
+	// t, err := strconv.ParseFloat(args[4], 32)
+	// if err != nil {
+	// 	sendErrorResponse(conn, errors.New("参数Temperature,6错误！"))
+	// 	return
+	// }
 	ubody := &def.CarDyReq{
-		CarNumber: args[0], Lock: lock, Commander: args[2], Velocity: float32(v), Temperature: float32(t),
-		FaultCode: args[5],
+		CarNumber: args[0], Lock: lock, Commander: args[2], Velocity: 0, Temperature: 28,
+		FaultCode: "",
 	}
 
 	resp, err := service.UnLockCar(ubody)

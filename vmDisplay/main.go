@@ -9,9 +9,10 @@ import (
 )
 
 func main() {
-
+	var poin string
+	fmt.Scanln(&poin)
 	var tcpAddr *net.TCPAddr
-	tcpAddr, _ = net.ResolveTCPAddr("tcp", "127.0.0.1:9000")
+	tcpAddr, _ = net.ResolveTCPAddr("tcp", "127.0.0.1:"+poin)
 
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 
@@ -26,7 +27,7 @@ func main() {
 		fmt.Println("connect has closed!\n")
 	}(5)
 
-	fmt.Println(conn.LocalAddr().String() + " : Client connected!")
+	fmt.Println(conn.LocalAddr().String() + " : Client connected, poin:" + poin)
 
 	go MessageReceived(conn)
 	onMessageSend(conn)
