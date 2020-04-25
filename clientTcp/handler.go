@@ -362,8 +362,19 @@ func deleteRoad(conn *net.TCPConn, args []string) {
 func onRoad(conn *net.TCPConn, args []string) {
 	roadCode := args[0]
 	carNum := args[1]
+	v, err := strconv.ParseFloat(args[2], 32)
+	if err != nil {
+		sendErrorResponse(conn, err)
+	}
 
 	resp, err := service.OnRoad(roadCode, carNum)
+	if err != nil {
+		sendErrorResponse(conn, err)
+		return
+	}
+
+	cGRL := &def.CheckRGL{CarNumber: carNum, Road: roadCode, Velocity: float32(v)}
+	_, err = service.CheckRGL(cGRL)
 	if err != nil {
 		sendErrorResponse(conn, err)
 		return
