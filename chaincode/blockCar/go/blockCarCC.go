@@ -257,6 +257,9 @@ func (t *BlockCarCC) carState(stub shim.ChaincodeStubInterface, args []string) p
 //args:json carDyReq
 func (t *BlockCarCC) lockCar(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 	carNum, err := putCar(stub, args)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
 
 	err = stub.SetEvent(carNum+",islock", []byte("lock")) //set event lock
 	if err != nil {
@@ -270,6 +273,9 @@ func (t *BlockCarCC) lockCar(stub shim.ChaincodeStubInterface, args []string) pe
 //args:json carDyReq
 func (t *BlockCarCC) unLockCar(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 	carNum, err := putCar(stub, args)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
 
 	err = stub.SetEvent(carNum+",islock", []byte("unlock")) //set event lock
 	if err != nil {
@@ -388,7 +394,7 @@ func putCar(stub shim.ChaincodeStubInterface, args []string) (string, error) {
 	if err != nil {
 		return "", err
 	} else if carDyAsBytes == nil {
-		return "", errors.New("信息不纯在")
+		return "", errors.New("信息不存在")
 	}
 
 	carDy := &def.CarDy{}
@@ -396,6 +402,9 @@ func putCar(stub shim.ChaincodeStubInterface, args []string) (string, error) {
 		return "", err
 	}
 
+	if carDyReq.Commander != carDy.Commander {
+		return "", errors.New("操作失败，没有权限！")
+	}
 	carDy.Lock = carDyReq.Lock
 
 	//判断 carNum 是否存在
