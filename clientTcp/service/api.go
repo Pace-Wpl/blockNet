@@ -311,7 +311,7 @@ func OnRoad(roadCode string, carNum string) ([]byte, error) {
 	reg, notifier := regitserEvent(ServiceClient.Client, ServiceClient.ChaincodeID, eventID)
 	defer ServiceClient.Client.UnregisterChaincodeEvent(reg)
 
-	req := channel.Request{ChaincodeID: ServiceClient.ChaincodeID, Fcn: "onRoad", Args: [][]byte{[]byte(roadCode), []byte(carNum)}}
+	req := channel.Request{ChaincodeID: ServiceClient.ChaincodeID, Fcn: "onRoad", Args: [][]byte{[]byte(roadCode), []byte(carNum), []byte(eventID)}}
 	_, err := ServiceClient.Client.Query(req)
 	if err != nil {
 		return []byte{}, err
@@ -461,10 +461,10 @@ func RglCheck(carNum string, conn *net.TCPConn) {
 }
 
 //onRoad listen
-func OnRoadListen(carNum string, conn *net.TCPConn) {
-	// CheckRGL(cGRL *def.CheckRGL)
-	sendTips(conn, "on the tag 1 road!")
-}
+// func OnRoadListen(carNum string, conn *net.TCPConn) {
+// 	// CheckRGL(cGRL *def.CheckRGL)
+// 	sendTips(conn, "on the tag 1 road!")
+// }
 
 func sendTips(conn *net.TCPConn, message string) {
 	conn.Write([]byte(message + "\n"))

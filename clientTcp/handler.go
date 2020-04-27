@@ -363,14 +363,14 @@ func onRoad(conn *net.TCPConn, args []string) {
 		sendErrorResponse(conn, err)
 	}
 
-	resp, err := service.OnRoad(roadCode, carNum)
-	if err != nil {
-		sendErrorResponse(conn, err)
-		return
-	}
+	// resp, err := service.OnRoad(roadCode, carNum)
+	// if err != nil {
+	// 	sendErrorResponse(conn, err)
+	// 	return
+	// }
 
 	cGRL := &def.CheckRGL{CarNumber: carNum, Road: roadCode, Velocity: float32(v)}
-	_, err = service.CheckRGL(cGRL)
+	resp, err := service.CheckRGL(cGRL)
 	if err != nil {
 		sendErrorResponse(conn, err)
 		return

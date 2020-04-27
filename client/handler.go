@@ -12,6 +12,121 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+func OnRoad(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	res, _ := ioutil.ReadAll(r.Body)
+	log.Println(string(res))
+	ubody := &def.OnRoadReq{}
+
+	if err := json.Unmarshal(res, ubody); err != nil {
+		log.Println(err)
+		sendErrorResponse(w, def.ERROR_BAD_REQUETS)
+		return
+	}
+
+	onRoad := &def.OnRoad{
+		ObjectType: "onRoad", CarNum: ubody.CarNum, Velocity: ubody.Velocity, Direction: ubody.Direction,
+		Position: ubody.Position, Code: ubody.Code,
+	}
+
+	_, err := service.CheckCollision(onRoad)
+	if err != nil {
+		log.Println(err)
+		sendErrorResponse(w, def.ERROR_INTERNAL)
+		return
+	}
+
+	resp, err := service.CheckRGL(onRoad)
+	if err != nil {
+		log.Println(err)
+		sendErrorResponse(w, def.ERROR_INTERNAL)
+		return
+	}
+
+	sendNormalResponse(w, string(resp))
+}
+
+func GetRGL(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	res, _ := ioutil.ReadAll(r.Body)
+	ubody := &def.RglReq{}
+
+	if err := json.Unmarshal(res, ubody); err != nil {
+		sendErrorResponse(w, def.ERROR_BAD_REQUETS)
+		return
+	}
+	resp, err := service.GetRGL(ubody.RglID)
+	if err != nil {
+		sendErrorResponse(w, def.ERROR_INTERNAL)
+		return
+	}
+
+	sendNormalResponse(w, string(resp))
+}
+
+func CarRGL(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	carNum := p.ByName("car_num")
+
+	resp, err := service.CarRGL(carNum)
+	if err != nil {
+		sendErrorResponse(w, def.ERROR_INTERNAL)
+		return
+	}
+
+	sendNormalResponse(w, string(resp))
+
+}
+
+func DealRGL(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	res, _ := ioutil.ReadAll(r.Body)
+	ubody := &def.RglReq{}
+
+	if err := json.Unmarshal(res, ubody); err != nil {
+		sendErrorResponse(w, def.ERROR_BAD_REQUETS)
+		return
+	}
+	resp, err := service.DealRGL(ubody.RglID)
+	if err != nil {
+		sendErrorResponse(w, def.ERROR_INTERNAL)
+		return
+	}
+
+	sendNormalResponse(w, resp)
+}
+
+func GetRglHistory(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	res, _ := ioutil.ReadAll(r.Body)
+	ubody := &def.RglReq{}
+
+	if err := json.Unmarshal(res, ubody); err != nil {
+		sendErrorResponse(w, def.ERROR_BAD_REQUETS)
+		return
+	}
+	resp, err := service.GetHistoryRGL(ubody.RglID)
+	if err != nil {
+		sendErrorResponse(w, def.ERROR_INTERNAL)
+		return
+	}
+
+	sendNormalResponse(w, string(resp))
+}
+
+func PutRoad(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	res, _ := ioutil.ReadAll(r.Body)
+	ubody := &def.RoadInformation{}
+
+	if err := json.Unmarshal(res, ubody); err != nil {
+		sendErrorResponse(w, def.ERROR_BAD_REQUETS)
+		return
+	}
+	resp, err := service.UpdataRoad(ubody)
+	if err != nil {
+		sendErrorResponse(w, def.ERROR_INTERNAL)
+		return
+	}
+
+	sendNormalResponse(w, resp)
+
+}
+
 func TestChaincode(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	k := p.ByName("key")
 	fmt.Println(k)
@@ -39,37 +154,43 @@ func InitCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	if err := json.Unmarshal(res, ubody); err != nil {
 		fmt.Printf("unmarshal error 1:%s\n", err)
+		sendErrorResponse(w, def.ERROR_BAD_REQUETS)
 		return
 	}
 
 	resp, err := service.InitCar(ubody)
 	if err != nil {
 		fmt.Printf("servic init error 2:%s\n", err)
+		sendErrorResponse(w, def.ERROR_INTERNAL)
 	}
 
-	fmt.Printf("Car init successful:%s!\n", resp)
+	tcps.Chan <- ubody.CarNumber //开启TCP任务
+
+	sendNormalResponse(w, resp)
 }
 
 //request body:string car id
 func GetCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	carNum := p.ByName("car_num")
+	carNum := p.ByName("car_id")
 
 	car, err := service.GetCar(carNum)
 	if err != nil {
 		log.Printf("error:%s\n", err)
+		sendErrorResponse(w, def.ERROR_INTERNAL)
 		return
 	}
 
-	fmt.Println(car)
+	sendNormalResponse(w, string(car))
 }
 
 //request body:json carDyReq
 func PutCarDy(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	res, _ := ioutil.ReadAll(r.Body)
+	log.Println(string(res))
 	ubody := &def.CarDyReq{}
 
 	if err := json.Unmarshal(res, ubody); err != nil {
-		fmt.Println("request error!")
+		sendErrorResponse(w, def.ERROR_BAD_REQUETS)
 		return
 	}
 
@@ -78,13 +199,13 @@ func PutCarDy(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		fmt.Println(err)
 	}
 
-	fmt.Printf("put carDy successful!\n")
+	sendNormalResponse(w, "successful!")
 }
 
 //request body: json carDyReq
 func LockCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	res, _ := ioutil.ReadAll(r.Body)
-	ubody := &def.CarDyReq{}
+	ubody := &def.LockCar{}
 
 	if err := json.Unmarshal(res, ubody); err != nil {
 		fmt.Println("request error!")
@@ -96,23 +217,40 @@ func LockCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		fmt.Println(err)
 	}
 
-	fmt.Printf("lock car successful:%s!\n", resp)
+	sendNormalResponse(w, resp)
 }
 
-//request : owner
-func QueryCarByOwner(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	o := p.ByName("owner_name")
-	resp, err := service.QueryCarByOwner(o)
-	if err != nil {
-		log.Printf("error:%s\n", err)
+func UnLockCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	res, _ := ioutil.ReadAll(r.Body)
+	ubody := &def.LockCar{}
+
+	if err := json.Unmarshal(res, ubody); err != nil {
+		fmt.Println("request error!")
 		return
 	}
 
-	fmt.Println(resp)
+	resp, err := service.UnLockCar(ubody)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	sendNormalResponse(w, resp)
 }
 
+//request : owner
+// func QueryCarByOwner(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+// 	o := p.ByName("owner_name")
+// 	resp, err := service.QueryCarByOwner(o)
+// 	if err != nil {
+// 		log.Printf("error:%s\n", err)
+// 		return
+// 	}
+
+// 	fmt.Println(resp)
+// }
+
 //request: carNum
-func QueryCarHistry(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func GetCarHistory(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	carNum := p.ByName("car_num")
 	resp, err := service.QueryHistoryForCar(carNum)
 	if err != nil {
@@ -120,5 +258,11 @@ func QueryCarHistry(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 		return
 	}
 
-	fmt.Println(resp)
+	sendNormalResponse(w, string(resp))
+}
+
+func TaskOpen(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	carNum := p.ByName("car_num")
+	tcps.Chan <- carNum //开启TCP任务
+	sendNormalResponse(w, "open task:"+carNum)
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"math/rand"
 	"time"
 
@@ -101,34 +102,76 @@ func (t *BlockCarCC) readRoad(stub shim.ChaincodeStubInterface, args []string) p
 	return shim.Success(resp)
 }
 
-//在路上,汽车传输正在行使的道路信息
-//args: road code, car number,event id
-func (t *BlockCarCC) onRoad(stub shim.ChaincodeStubInterface, args []string) peer.Response {
-	rc := args[0]
-	carNum := args[1]
+//在路上,汽车传输正在行使的道路信息 ,检测超速，追尾
+//args: OnRoad
+// func (t *BlockCarCC) onRoad(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+// 	or := &def.OnRoad{}
 
-	roadInfoAsBytes, err := stub.GetState(rc)
-	if err != nil {
-		return shim.Error(err.Error())
-	} else if roadInfoAsBytes == nil {
-		return shim.Error("can not discern the road!")
-	}
+// 	if err := json.Unmarshal([]byte(args[0]), or); err != nil {
+// 		return shim.Error(def.ErrorInternalFaults)
+// 	}
 
-	roadInfo := &def.RoadInformation{}
-	if err = json.Unmarshal(roadInfoAsBytes, roadInfo); err != nil {
+// 	roadInfoAsBytes, err := stub.GetState(or.Code)
+// 	if err != nil {
+// 		return shim.Error(err.Error())
+// 	} else if roadInfoAsBytes == nil {
+// 		return shim.Error("can not discern the road!")
+// 	}
+
+// 	//追尾检测
+// 	t.checkCollision(stub, or)
+// 	//超速检测
+// 	t.checkRGL(stub, or)
+
+// 	return shim.Success(nil)
+// }
+
+//追尾检测
+//args: json Onroad
+func (t *BlockCarCC) checkCollision(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	o := &def.OnRoad{}
+
+	if err := json.Unmarshal([]byte(args[0]), o); err != nil {
 		return shim.Error(def.ErrorInternalFaults)
 	}
+	objType := "onRoad"
+	queryStr := fmt.Sprintf("{\"selector\":{\"objectType\":\"%s\",\"roadCode\":\"%s\",\"direction\":\"%s\"}}", objType, o.Code, o.Direction)
 
-	switch roadInfo.Tag {
-	case 1:
-		err := stub.SetEvent(carNum+",onRoad", []byte("tag:1"))
+	resultIterator, err := stub.GetQueryResult(queryStr)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	defer resultIterator.Close()
+
+	var or def.OnRoad
+	for resultIterator.HasNext() {
+		queryResponse, err := resultIterator.Next()
 		if err != nil {
 			return shim.Error(err.Error())
 		}
-	default:
+
+		if err := json.Unmarshal(queryResponse.Value, &or); err != nil {
+			return shim.Error(err.Error())
+		}
+		if o.CarNum != or.CarNum {
+			distance := float64(o.Position - or.Position)
+			ve := float64(o.Velocity - or.Velocity)
+			if checkCollisionAlg(distance, ve, 3) { //追尾检测
+				err = stub.SetEvent(o.CarNum+",collision", []byte{})
+				if err != nil {
+					return shim.Error(err.Error())
+				}
+			}
+		}
 	}
 
-	err = stub.SetEvent(args[1], []byte{}) //set event init
+	key := o.CarNum + ",onRoad"
+	oAsJSON, err := json.Marshal(o)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	err = stub.PutState(key, oAsJSON)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -136,15 +179,54 @@ func (t *BlockCarCC) onRoad(stub shim.ChaincodeStubInterface, args []string) pee
 	return shim.Success(nil)
 }
 
-//违法检测：超速
-//args:json CheckRGL,
-func (t *BlockCarCC) checkRGL(stub shim.ChaincodeStubInterface, args []string) peer.Response {
-	c := &def.CheckRGL{}
-	if err := json.Unmarshal([]byte(args[0]), c); err != nil {
+//追尾检测算法，
+//args:距离，速度差，反映时间
+func checkCollisionAlg(distance, ve, duration float64) bool {
+	if math.Abs(ve*duration) >= math.Abs(distance) {
+		return true
+	}
+	return false
+}
+
+func (t *BlockCarCC) testCollision(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	objType := "onRoad"
+	queryStr := fmt.Sprintf("{\"selector\":{\"objectType\":\"%s\",\"roadCode\":\"%s\",\"direction\":\"%s\"}}", objType, args[0], args[1])
+	resultIterator, err := stub.GetQueryResult(queryStr)
+	if err != nil {
 		return shim.Error(err.Error())
 	}
+	defer resultIterator.Close()
 
-	roadAsByte, err := stub.GetState(c.Road)
+	var or def.OnRoad
+	var item []def.OnRoad
+	for resultIterator.HasNext() {
+		queryResponse, err := resultIterator.Next()
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		if err := json.Unmarshal(queryResponse.Value, &or); err != nil {
+			return shim.Error(err.Error())
+		}
+
+		item = append(item, or)
+	}
+
+	itemAsJSON, err := json.Marshal(item)
+
+	return shim.Success(itemAsJSON)
+}
+
+//违法检测：超速
+//args:json Onroads,
+func (t *BlockCarCC) checkRGL(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	c := &def.OnRoad{}
+
+	if err := json.Unmarshal([]byte(args[0]), c); err != nil {
+		return shim.Error(def.ErrorInternalFaults)
+	}
+
+	roadAsByte, err := stub.GetState(c.Code)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -155,11 +237,6 @@ func (t *BlockCarCC) checkRGL(stub shim.ChaincodeStubInterface, args []string) p
 	}
 
 	if c.Velocity > roadInfo.Limit {
-		err := stub.SetEvent(c.CarNumber+",speedLimit", []byte("speeding in the road :"+roadInfo.Name+"!"))
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-
 		id := func(len int) string { //5 位随即字符串
 			bytes := make([]byte, len)
 			for i := 0; i < len; i++ {
@@ -172,7 +249,7 @@ func (t *BlockCarCC) checkRGL(stub shim.ChaincodeStubInterface, args []string) p
 		rglInfo := &def.RegulationsInfo{
 			ObjectType: "RegulationsInfo",
 			ID:         id,
-			CarNumber:  c.CarNumber, Road: c.Road, Type: "speeding", Mes: "speeding in the road :" + roadInfo.Name + "! RGL id :" + id,
+			CarNumber:  c.CarNum, Road: c.Code, Type: "speeding", Mes: "speeding in the road :" + roadInfo.Name + "! RGL id :" + id,
 		}
 
 		rglAsBytes, err := json.Marshal(rglInfo)
@@ -181,6 +258,11 @@ func (t *BlockCarCC) checkRGL(stub shim.ChaincodeStubInterface, args []string) p
 		}
 
 		err = stub.PutState(rglInfo.ID, rglAsBytes)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		err = stub.SetEvent(c.CarNum+",speedLimit", []byte("speeding in the road :"+roadInfo.Name+"!"))
 		if err != nil {
 			return shim.Error(err.Error())
 		}
@@ -317,11 +399,6 @@ func (t *BlockCarCC) carRgl(stub shim.ChaincodeStubInterface, args []string) pee
 	}
 	resp := &def.CarRGLItem{Item: rglItem}
 	rglItemAsBytes, err := json.Marshal(resp)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-
-	err = stub.SetEvent(args[1], []byte{}) //set event init
 	if err != nil {
 		return shim.Error(err.Error())
 	}

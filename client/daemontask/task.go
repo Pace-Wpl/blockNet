@@ -5,8 +5,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/blockNet/clientTcp/def"
-	"github.com/blockNet/clientTcp/service"
+	"github.com/blockNet/client/def"
+	"github.com/blockNet/client/service"
 	ch "github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 )
@@ -15,6 +15,12 @@ type Task struct {
 	Controller chan string
 	Conn       *net.TCPConn
 	Flag       bool
+}
+
+func NewTask(Conn *net.TCPConn) *Task {
+	c := make(chan string)
+
+	return &Task{Controller: c, Conn: Conn}
 }
 
 func (t *Task) eventResult(notifier <-chan *fab.CCEvent) bool {
@@ -33,11 +39,8 @@ func regitserEvent(client *ch.Client, chaincodeID, eventID string) (fab.Registra
 	reg, notifier, err := client.RegisterChaincodeEvent(chaincodeID, eventID)
 	if err != nil {
 		fmt.Println("注册监听失败,请重新开启...")
-		// fmt.Println("注册监听失败,请重新开启...")
-		// client.UnregisterChaincodeEvent(reg)
-		// time.Sleep(time.Duration(10) * time.Second)
-		// reg, notifier = regitserEvent(client, chaincodeID, eventID)
 	}
+	fmt.Println("注册监听：" + eventID)
 	// fmt.Println("正在监听...")
 	return reg, notifier
 }
@@ -48,12 +51,14 @@ func (t *Task) ListenTask(event string, CarNum string) {
 
 		if t.eventResult(notifier) {
 			switch event {
-			case def.LOCK_EVENT:
+			case CarNum + def.LOCK_EVENT:
 				service.LockCheck(CarNum, t.Conn)
-			case def.FAULTCODE_EVENT:
-				service.FaulCheck(CarNum, t.Conn)
-			case def.RGL_EVENT_SPPED:
+			// case def.FAULTCODE_EVENT:
+			// 	service.FaulCheck(CarNum, t.Conn)
+			case CarNum + def.RGL_EVENT_SPPED:
 				service.RglCheck(CarNum, t.Conn)
+			case CarNum + def.COLLIS_EVENT:
+				service.CollisCheck(CarNum, t.Conn)
 				// case def.ON_ROAD_EVENT:
 				// 	service.OnRoadListen(CarNum, t.Conn)
 			}
@@ -69,9 +74,9 @@ func (t *Task) ListenTask(event string, CarNum string) {
 //开启监听
 func (t *Task) StartDaemon(CarNum string) {
 	t.Flag = true
-	go t.ListenTask(def.FAULTCODE_EVENT, CarNum)
-	go t.ListenTask(def.LOCK_EVENT, CarNum)
-	go t.ListenTask(def.RGL_EVENT_SPPED, CarNum)
+	go t.ListenTask(CarNum+def.COLLIS_EVENT, CarNum)
+	go t.ListenTask(CarNum+def.LOCK_EVENT, CarNum)
+	go t.ListenTask(CarNum+def.RGL_EVENT_SPPED, CarNum)
 	// go t.ListenTask(def.ON_ROAD_EVENT, CarNum)
 }
 

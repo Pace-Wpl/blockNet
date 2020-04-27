@@ -5,10 +5,17 @@ type RoadInformation struct {
 	ObjectType string  `json:"objectType"`
 	Code       string  `json:"roadCode"`   // 道路编码
 	Name       string  `json:"roadName"`   // 道路名字
-	Coordinate string  `json:"coordinate"` // 坐标
-	Type       string  `json:"roadType"`   // 道路类型
 	Limit      float32 `json:"speedLimit"` // 限速
-	Tag        int     `json:"roadTag"`    // 标签
+}
+
+//OnRoad
+type OnRoad struct {
+	ObjectType string  `json:"objectType"`
+	Code       string  `json:"roadCode"`  // 道路编码
+	CarNum     string  `json:"carNum"`    // 车牌号
+	Velocity   float32 `json:"velocity"`  // 速度
+	Direction  string  `json:"direction"` // 方向
+	Position   int     `json:"position"`  // 坐标
 }
 
 // 违章信息

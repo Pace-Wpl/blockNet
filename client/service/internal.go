@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"fmt"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 func regitserEvent(client *ch.Client, chaincodeID, eventID string) (fab.Registration, <-chan *fab.CCEvent) {
 
 	reg, notifier, err := client.RegisterChaincodeEvent(chaincodeID, eventID)
+	fmt.Println("足册:" + eventID)
 	if err != nil {
 		fmt.Printf("注册链码事件失败: %s", err)
 	}
@@ -23,10 +25,13 @@ func eventResult(notifier <-chan *fab.CCEvent, eventID string) (string, error) {
 	select {
 	case ccEvent := <-notifier:
 		fmt.Printf("接收到链码事件: %v\n", ccEvent)
-		return ccEvent.EventName, nil
+		if bytes.Equal(ccEvent.Payload, []byte{}) {
+			return "Successful!", nil
+		} else {
+			return string(ccEvent.Payload) + "11", nil
+		}
 	case <-time.After(time.Second * 20):
 		fmt.Errorf("不能根据指定的事件ID接收到相应的链码事件(%s)", eventID)
-		return "不能根据指定的事件ID接收到相应的链码事件(" + eventID + ")", nil
+		return "不能根据指定的事件ID接收到相应的链码事件(" + eventID + ")\n", nil
 	}
-	return "", nil
 }

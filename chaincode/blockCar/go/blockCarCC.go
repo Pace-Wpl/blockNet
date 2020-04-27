@@ -33,7 +33,7 @@ func (t *BlockCarCC) testChaincodeQ(stub shim.ChaincodeStubInterface, args []str
 }
 
 //init;
-//args: json CarInfomation, json CarDy, event id
+//args: json CarInfomation, json CarDy, json LockCar, event id
 func (t *BlockCarCC) initCar(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	carInfo := &def.CarInfomation{}
@@ -66,7 +66,13 @@ func (t *BlockCarCC) initCar(stub shim.ChaincodeStubInterface, args []string) pe
 		return shim.Error(err.Error())
 	}
 
-	err = stub.SetEvent(args[2], []byte{}) //set event init
+	key := carInfo.CarNumber + ";lock"
+	err = stub.PutState(key, []byte(args[2]))
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	err = stub.SetEvent(args[3], []byte{}) //set event init
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -128,7 +134,7 @@ func (t *BlockCarCC) putCarDy(stub shim.ChaincodeStubInterface, args []string) p
 	// 	return shim.Error("car  不存在！")
 	// }
 
-	CarDy := &def.CarDy{ObjectType: "carDy", Lock: carDyReq.Lock, Commander: carDyReq.Commander, Velocity: carDyReq.Velocity, Temperature: carDyReq.Temperature, FaultCode: carDyReq.FaultCode}
+	CarDy := &def.CarDy{ObjectType: "carDy", Certificate: carDyReq.Certificate, Velocity: carDyReq.Velocity, Temperature: carDyReq.Temperature, FaultCode: carDyReq.FaultCode}
 	CarDyJSON, err := json.Marshal(CarDy)
 	if err != nil {
 		return shim.Error(def.ErrorInternalFaults)
@@ -139,10 +145,10 @@ func (t *BlockCarCC) putCarDy(stub shim.ChaincodeStubInterface, args []string) p
 		return shim.Error(err.Error())
 	}
 
-	err = faultHandle(stub, carDyReq)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
+	// err = faultHandle(stub, carDyReq)
+	// if err != nil {
+	// 	return shim.Error(err.Error())
+	// }
 
 	return shim.Success(nil)
 }
@@ -214,9 +220,16 @@ func (t *BlockCarCC) readCar(stub shim.ChaincodeStubInterface, args []string) pe
 		return shim.Error(err.Error())
 	}
 
+	key := carInfo.CarNumber + ";lock"
+	carLockJSON, err := stub.GetState(key)
+	carLock := &def.Lock{}
+	if err = json.Unmarshal(carLockJSON, carLock); err != nil {
+		return shim.Error(err.Error())
+	}
+
 	rulst := &def.CarResp{
-		Name: carInfo.Name, CarNumber: carInfo.CarNumber, ID: carInfo.ID, Owner: carInfo.Owner,
-		Type: carInfo.Type, Colour: carInfo.Colour, Lock: carDy.Lock, Commander: carDy.Commander,
+		Name: carInfo.Name, CarNumber: carInfo.CarNumber, ID: carInfo.ID, Owner: carInfo.Certificate,
+		Type: carInfo.Type, Colour: carInfo.Colour, Certificate: carDy.Certificate, Lock: carLock.Lc,
 		Velocity: carDy.Velocity, Temperature: carDy.Temperature, FaultCode: carDy.FaultCode,
 	}
 
@@ -253,10 +266,10 @@ func (t *BlockCarCC) carState(stub shim.ChaincodeStubInterface, args []string) p
 	return shim.Success(resp)
 }
 
-//上锁;
-//args:json carDyReq
+//上/开 锁;
+//args:json LockCar
 func (t *BlockCarCC) lockCar(stub shim.ChaincodeStubInterface, args []string) peer.Response {
-	carNum, err := putCar(stub, args)
+	carNum, err := lockCar(stub, []byte(args[0]))
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -270,9 +283,9 @@ func (t *BlockCarCC) lockCar(stub shim.ChaincodeStubInterface, args []string) pe
 }
 
 //开锁;
-//args:json carDyReq
+//args:json LockCar
 func (t *BlockCarCC) unLockCar(stub shim.ChaincodeStubInterface, args []string) peer.Response {
-	carNum, err := putCar(stub, args)
+	carNum, err := lockCar(stub, []byte(args[0]))
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -375,42 +388,44 @@ func (t *BlockCarCC) deleteCar(stub shim.ChaincodeStubInterface, args []string) 
 }
 
 //错误码处理
-func faultHandle(stub shim.ChaincodeStubInterface, carDy *def.CarDyReq) error {
-	switch carDy.FaultCode {
-	case "":
-		return nil
-	default:
-		err := stub.SetEvent(carDy.CarNumber+",faultcode", []byte("unknown error，fault code:"+carDy.FaultCode))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
+// func faultHandle(stub shim.ChaincodeStubInterface, carDy *def.CarDyReq) error {
+// 	switch carDy.FaultCode {
+// 	case "":
+// 		return nil
+// 	default:
+// 		err := stub.SetEvent(carDy.CarNumber+",faultcode", []byte("unknown error，fault code:"+carDy.FaultCode))
+// 		if err != nil {
+// 			return err
+// 		}
+// 	}
+// 	return nil
+// }
 
 //更新锁车动态信息
-func putCar(stub shim.ChaincodeStubInterface, args []string) (string, error) {
-	carDyReq := &def.CarDyReq{}
-	if err := json.Unmarshal([]byte(args[0]), carDyReq); err != nil {
+func lockCar(stub shim.ChaincodeStubInterface, args []byte) (string, error) {
+	carDyReq := &def.LockCar{}
+	if err := json.Unmarshal(args, carDyReq); err != nil {
 		return "", err
 	}
 
-	carDyAsBytes, err := stub.GetState(carDyReq.CarNumber)
+	key := carDyReq.CarNum + ";lock"
+	carDyAsBytes, err := stub.GetState(key)
 	if err != nil {
 		return "", err
 	} else if carDyAsBytes == nil {
 		return "", errors.New("信息不存在")
 	}
 
-	carDy := &def.CarDy{}
+	carDy := &def.Lock{}
 	if err = json.Unmarshal(carDyAsBytes, carDy); err != nil {
 		return "", err
 	}
 
-	if carDyReq.Commander != carDy.Commander {
+	if carDyReq.Certificate != carDy.Certificate {
 		return "", errors.New("操作失败，没有权限！")
+	} else {
+		carDy.Lc = carDyReq.Lc
 	}
-	carDy.Lock = carDyReq.Lock
 
 	//判断 carNum 是否存在
 	// carDyAsBytes, err := stub.GetState(carDyReq.CarNumber)
@@ -426,15 +441,23 @@ func putCar(stub shim.ChaincodeStubInterface, args []string) (string, error) {
 		return "", err
 	}
 
-	err = stub.PutState(carDyReq.CarNumber, CarDyJSON)
+	err = stub.PutState(key, CarDyJSON)
 	if err != nil {
 		return "", err
 	}
 
-	err = faultHandle(stub, carDyReq)
+	return carDyReq.CarNum, nil
+}
+
+//
+//args: carNum
+func (t *BlockCarCC) getLock(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	key := args[0] + ";lock"
+
+	LockJSON, err := stub.GetState(key)
 	if err != nil {
-		return "", err
+		return shim.Error(err.Error())
 	}
 
-	return carDyReq.CarNumber, nil
+	return shim.Success(LockJSON)
 }

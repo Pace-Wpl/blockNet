@@ -40,6 +40,16 @@ type CarRGLItem struct {
 	Item []RegulationsInfo `json:"item"`
 }
 
+// 违章信息
+type RegulationsInfo struct {
+	ObjectType string `json:"objectType"`
+	ID         string `json:"regulationsId"` // 违章id
+	CarNumber  string `json:"carNumber"`     // 车牌号
+	Road       string `json:"road_code"`     // 违章地点
+	Type       string `json:"type"`          // 违章类型
+	Mes        string `json:"message"`       // 违章信息
+}
+
 //request
 type CheckRGL struct {
 	CarNumber string  `json:"carNumber"` // 车牌号
@@ -56,16 +66,6 @@ type RoadInformation struct {
 	Type       string  `json:"roadType"`   // 道路类型
 	Limit      float32 `json:"speedLimit"` // 限速
 	Tag        int     `json:"roadTag"`    // 标签
-}
-
-// 违章信息
-type RegulationsInfo struct {
-	ObjectType string `json:"objectType"`
-	ID         string `json:"regulationsId"` // 违章id
-	CarNumber  string `json:"carNumber"`     // 车牌号
-	Road       string `json:"road_code"`     // 违章地点
-	Type       string `json:"type"`          // 违章类型
-	Mes        string `json:"message"`       // 违章信息
 }
 
 //历史信息
