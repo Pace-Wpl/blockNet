@@ -1,6 +1,12 @@
 package def
 
+type LockCarReq struct {
+	CarNum      string `json:"carNum"`      //车牌
+	Certificate string `json:"certificate"` // 证书
+}
+
 type LockCar struct {
+	ObjectType  string `json:"objectType"`
 	CarNum      string `json:"carNum"`      //车牌
 	Lc          bool   `json:"isLock"`      // 锁
 	Certificate string `json:"certificate"` // 证书
@@ -8,8 +14,8 @@ type LockCar struct {
 
 //汽车动态信息
 type CarDy struct {
-	ObjectType  string  `json:"objectType"`
-	Certificate string  `json:"certificate"` // 命令执行者
+	ObjectType string `json:"objectType"`
+	// Certificate string  `json:"certificate"` // 命令执行者
 	Velocity    float32 `json:"velocity"`    //速度
 	Temperature float32 `json:"temperature"` //温度
 	FaultCode   string  `json:"faultCode"`   // 故障码
@@ -88,9 +94,8 @@ type OnRoad struct {
 }
 
 //requets
-type OnRoadReq struct {
+type RoadReq struct {
 	Code      string  `json:"roadCode"`  // 道路编码
-	CarNum    string  `json:"carNum"`    // 车牌号
 	Velocity  float32 `json:"velocity"`  // 速度
 	Direction string  `json:"direction"` // 方向
 	Position  int     `json:"position"`  // 坐标

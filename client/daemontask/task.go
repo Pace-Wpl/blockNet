@@ -2,7 +2,6 @@ package daemontask
 
 import (
 	"fmt"
-	"net"
 	"time"
 
 	"github.com/blockNet/client/def"
@@ -13,14 +12,8 @@ import (
 
 type Task struct {
 	Controller chan string
-	Conn       *net.TCPConn
-	Flag       bool
-}
-
-func NewTask(Conn *net.TCPConn) *Task {
-	c := make(chan string)
-
-	return &Task{Controller: c, Conn: Conn}
+	// Conn       *net.TCPConn
+	Flag bool
 }
 
 func (t *Task) eventResult(notifier <-chan *fab.CCEvent) bool {
@@ -52,13 +45,13 @@ func (t *Task) ListenTask(event string, CarNum string) {
 		if t.eventResult(notifier) {
 			switch event {
 			case CarNum + def.LOCK_EVENT:
-				service.LockCheck(CarNum, t.Conn)
+				service.LockCheck(CarNum)
 			// case def.FAULTCODE_EVENT:
 			// 	service.FaulCheck(CarNum, t.Conn)
 			case CarNum + def.RGL_EVENT_SPPED:
-				service.RglCheck(CarNum, t.Conn)
+				service.RglCheck(CarNum)
 			case CarNum + def.COLLIS_EVENT:
-				service.CollisCheck(CarNum, t.Conn)
+				service.CollisCheck(CarNum)
 				// case def.ON_ROAD_EVENT:
 				// 	service.OnRoadListen(CarNum, t.Conn)
 			}

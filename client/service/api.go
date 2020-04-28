@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net"
+	"sync"
 
 	"github.com/blockNet/client/def"
 	"github.com/blockNet/client/utils"
@@ -42,14 +43,14 @@ func InitCar(car *def.CarInit) (string, error) {
 	reg, notifier := regitserEvent(ServiceClient.Client, ServiceClient.ChaincodeID, eventID)
 	defer ServiceClient.Client.UnregisterChaincodeEvent(reg)
 
-	carDy := &def.CarDy{ObjectType: "carDy", Certificate: car.Certificate,
-		Velocity: car.Velocity, Temperature: car.Temperature, FaultCode: "",
+	carDy := &def.CarDy{ObjectType: "carDy",
+		Velocity: 0.0, Temperature: 28.3, FaultCode: "",
 	}
 	carInfo := &def.CarInfomation{ObjectType: "carInfomation", Name: car.Name, CarNumber: car.CarNumber,
 		ID: car.ID, Certificate: car.Certificate, Type: car.Type, Colour: car.Colour,
 	}
 
-	lock := &def.Lock{ObjectType: "carLock", Lc: false, Certificate: car.Certificate}
+	lock := &def.LockCar{ObjectType: "carLock", Lc: false, Certificate: car.Certificate, CarNum: car.CarNumber}
 
 	lockJSON, err := json.Marshal(lock)
 	if err != nil {
@@ -66,6 +67,9 @@ func InitCar(car *def.CarInit) (string, error) {
 		return "", err
 	}
 
+	log.Println(string(carInfoAsJSON))
+	log.Println(string(carDyAsJSON))
+	log.Println(string(lockJSON))
 	req := channel.Request{ChaincodeID: ServiceClient.ChaincodeID, Fcn: "initCar", Args: [][]byte{carInfoAsJSON, carDyAsJSON, lockJSON, []byte(eventID)}}
 	_, err = ServiceClient.Client.Execute(req)
 	if err != nil {
@@ -395,21 +399,21 @@ func getLock(carNum string) ([]byte, error) {
 	return resp.Payload, nil
 }
 
-//锁监听
-func LockCheck(carNum string, conn *net.TCPConn) {
-	resp, err := getLock(carNum)
-	carDy := &def.Lock{}
+// //锁监听
+// func LockCheck(carNum string, conn *net.TCPConn) {
+// 	resp, err := getLock(carNum)
+// 	carDy := &def.Lock{}
 
-	if err = json.Unmarshal(resp, carDy); err != nil {
-		log.Printf("监听 unmarshal errror :%s\n", err)
-	}
+// 	if err = json.Unmarshal(resp, carDy); err != nil {
+// 		log.Printf("监听 unmarshal errror :%s\n", err)
+// 	}
 
-	if carDy.Lc {
-		sendTips(conn, "car was locked!\n")
-	} else {
-		sendTips(conn, "car was opened!\n")
-	}
-}
+// 	if carDy.Lc {
+// 		sendTips(conn, "car was locked!\n")
+// 	} else {
+// 		sendTips(conn, "car was opened!\n")
+// 	}
+// }
 
 //错误码监听
 func FaulCheck(carNum string, conn *net.TCPConn) {
@@ -425,23 +429,23 @@ func FaulCheck(carNum string, conn *net.TCPConn) {
 	}
 }
 
-//违章监听
-func RglCheck(carNum string, conn *net.TCPConn) {
-	resp, err := CarRGL(carNum)
-	rglInfoItem := &def.CarRGLItem{}
+// //违章监听
+// func RglCheck(carNum string, conn *net.TCPConn) {
+// 	resp, err := CarRGL(carNum)
+// 	rglInfoItem := &def.CarRGLItem{}
 
-	if err = json.Unmarshal(resp, rglInfoItem); err != nil {
-		log.Printf("监听 unmarshal errror :%s\n", err)
-	}
+// 	if err = json.Unmarshal(resp, rglInfoItem); err != nil {
+// 		log.Printf("监听 unmarshal errror :%s\n", err)
+// 	}
 
-	if rglInfoItem != nil {
-		sendTips(conn, "has a Regulations info :"+rglInfoItem.Item[0].Mes+"!\n")
-	}
-}
+// 	if rglInfoItem != nil {
+// 		sendTips(conn, "has a Regulations info :"+rglInfoItem.Item[0].Mes+"!\n")
+// 	}
+// }
 
-func CollisCheck(carNum string, conn *net.TCPConn) {
-	sendTips(conn, "有追尾风险！")
-}
+// func CollisCheck(carNum string, conn *net.TCPConn) {
+// 	sendTips(conn, "有追尾风险！")
+// }
 
 //onRoad listen
 // func OnRoadListen(carNum string, conn *net.TCPConn) {
@@ -460,4 +464,44 @@ func sendTips(conn *net.TCPConn, message string) {
 	}
 	conn.Write(resp)
 	conn.Write([]byte("\n"))
+}
+
+var MessageMap *sync.Map
+
+func init() {
+	MessageMap = &sync.Map{}
+}
+
+//锁监听
+func LockCheck(carNum string) {
+	resp, err := getLock(carNum)
+	carDy := &def.Lock{}
+
+	if err = json.Unmarshal(resp, carDy); err != nil {
+		log.Printf("监听 unmarshal errror :%s\n", err)
+	}
+
+	if carDy.Lc {
+		MessageMap.Store("lock", "car was locked!")
+	} else {
+		MessageMap.Store("lock", "car was opened!")
+	}
+}
+
+//违章监听
+func RglCheck(carNum string) {
+	resp, err := CarRGL(carNum)
+	rglInfoItem := &def.CarRGLItem{}
+
+	if err = json.Unmarshal(resp, rglInfoItem); err != nil {
+		log.Printf("监听 unmarshal errror :%s\n", err)
+	}
+
+	if rglInfoItem != nil {
+		MessageMap.Store("rgl", "has a Regulations info :"+rglInfoItem.Item[0].Mes+"!\n")
+	}
+}
+
+func CollisCheck(carNum string) {
+	MessageMap.Store("col", "有追尾风险！")
 }

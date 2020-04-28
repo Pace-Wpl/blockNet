@@ -134,7 +134,7 @@ func (t *BlockCarCC) putCarDy(stub shim.ChaincodeStubInterface, args []string) p
 	// 	return shim.Error("car  不存在！")
 	// }
 
-	CarDy := &def.CarDy{ObjectType: "carDy", Certificate: carDyReq.Certificate, Velocity: carDyReq.Velocity, Temperature: carDyReq.Temperature, FaultCode: carDyReq.FaultCode}
+	CarDy := &def.CarDy{ObjectType: "carDy", Velocity: carDyReq.Velocity, Temperature: carDyReq.Temperature, FaultCode: carDyReq.FaultCode}
 	CarDyJSON, err := json.Marshal(CarDy)
 	if err != nil {
 		return shim.Error(def.ErrorInternalFaults)
@@ -229,7 +229,7 @@ func (t *BlockCarCC) readCar(stub shim.ChaincodeStubInterface, args []string) pe
 
 	rulst := &def.CarResp{
 		Name: carInfo.Name, CarNumber: carInfo.CarNumber, ID: carInfo.ID, Owner: carInfo.Certificate,
-		Type: carInfo.Type, Colour: carInfo.Colour, Certificate: carDy.Certificate, Lock: carLock.Lc,
+		Type: carInfo.Type, Colour: carInfo.Colour, Lock: carLock.Lc,
 		Velocity: carDy.Velocity, Temperature: carDy.Temperature, FaultCode: carDy.FaultCode,
 	}
 

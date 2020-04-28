@@ -46,14 +46,9 @@ func OnRoad(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 }
 
 func GetRGL(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	res, _ := ioutil.ReadAll(r.Body)
-	ubody := &def.RglReq{}
+	rglID := p.ByName("rgl_id")
 
-	if err := json.Unmarshal(res, ubody); err != nil {
-		sendErrorResponse(w, def.ERROR_BAD_REQUETS)
-		return
-	}
-	resp, err := service.GetRGL(ubody.RglID)
+	resp, err := service.GetRGL(rglID)
 	if err != nil {
 		sendErrorResponse(w, def.ERROR_INTERNAL)
 		return
@@ -76,14 +71,9 @@ func CarRGL(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 }
 
 func DealRGL(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	res, _ := ioutil.ReadAll(r.Body)
-	ubody := &def.RglReq{}
+	rglID := p.ByName("rgl_id")
 
-	if err := json.Unmarshal(res, ubody); err != nil {
-		sendErrorResponse(w, def.ERROR_BAD_REQUETS)
-		return
-	}
-	resp, err := service.DealRGL(ubody.RglID)
+	resp, err := service.DealRGL(rglID)
 	if err != nil {
 		sendErrorResponse(w, def.ERROR_INTERNAL)
 		return
@@ -93,14 +83,9 @@ func DealRGL(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 }
 
 func GetRglHistory(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	res, _ := ioutil.ReadAll(r.Body)
-	ubody := &def.RglReq{}
+	rglID := p.ByName("rgl_id")
 
-	if err := json.Unmarshal(res, ubody); err != nil {
-		sendErrorResponse(w, def.ERROR_BAD_REQUETS)
-		return
-	}
-	resp, err := service.GetHistoryRGL(ubody.RglID)
+	resp, err := service.GetHistoryRGL(rglID)
 	if err != nil {
 		sendErrorResponse(w, def.ERROR_INTERNAL)
 		return
@@ -150,6 +135,7 @@ func TestChaincodQ(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 //request body:json carinit
 func InitCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	res, _ := ioutil.ReadAll(r.Body)
+	log.Println(string(res))
 	ubody := &def.CarInit{}
 
 	if err := json.Unmarshal(res, ubody); err != nil {
@@ -164,7 +150,7 @@ func InitCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		sendErrorResponse(w, def.ERROR_INTERNAL)
 	}
 
-	tcps.Chan <- ubody.CarNumber //开启TCP任务
+	go task.StartDaemon(ubody.CarNumber)
 
 	sendNormalResponse(w, resp)
 }
@@ -205,14 +191,16 @@ func PutCarDy(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 //request body: json carDyReq
 func LockCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	res, _ := ioutil.ReadAll(r.Body)
-	ubody := &def.LockCar{}
+	ubody := &def.LockCarReq{}
 
 	if err := json.Unmarshal(res, ubody); err != nil {
 		fmt.Println("request error!")
 		return
 	}
 
-	resp, err := service.LockCar(ubody)
+	lock := &def.LockCar{ObjectType: "carLock", CarNum: ubody.CarNum, Lc: true, Certificate: ubody.Certificate}
+
+	resp, err := service.LockCar(lock)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -222,14 +210,15 @@ func LockCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 func UnLockCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	res, _ := ioutil.ReadAll(r.Body)
-	ubody := &def.LockCar{}
+	ubody := &def.LockCarReq{}
 
 	if err := json.Unmarshal(res, ubody); err != nil {
 		fmt.Println("request error!")
 		return
 	}
 
-	resp, err := service.UnLockCar(ubody)
+	lock := &def.LockCar{ObjectType: "carLock", CarNum: ubody.CarNum, Lc: false, Certificate: ubody.Certificate}
+	resp, err := service.UnLockCar(lock)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -263,6 +252,28 @@ func GetCarHistory(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 
 func TaskOpen(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	carNum := p.ByName("car_num")
-	tcps.Chan <- carNum //开启TCP任务
+	go task.StartDaemon(carNum)
 	sendNormalResponse(w, "open task:"+carNum)
+}
+
+func Lms(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	mes, ok := service.MessageMap.Load("lock")
+	if ok {
+		log.Println("send mes :" + mes.(string))
+		sendNormalResponse(w, mes.(string))
+		service.MessageMap.Delete("lock")
+	}
+	mes1, ok1 := service.MessageMap.Load("col")
+	if ok1 {
+		log.Println("send mes :" + mes1.(string))
+		sendNormalResponse(w, mes1.(string))
+		service.MessageMap.Delete("col")
+	}
+	mes2, ok2 := service.MessageMap.Load("rgl")
+	if ok2 {
+		log.Println("send mes :" + mes2.(string))
+		sendNormalResponse(w, mes2.(string))
+		service.MessageMap.Delete("rgl")
+	}
+	// sendNormalResponse(w, "")
 }

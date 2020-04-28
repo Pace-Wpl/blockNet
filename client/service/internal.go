@@ -13,7 +13,7 @@ import (
 func regitserEvent(client *ch.Client, chaincodeID, eventID string) (fab.Registration, <-chan *fab.CCEvent) {
 
 	reg, notifier, err := client.RegisterChaincodeEvent(chaincodeID, eventID)
-	fmt.Println("足册:" + eventID)
+	// fmt.Println("足册:" + eventID)
 	if err != nil {
 		fmt.Printf("注册链码事件失败: %s", err)
 	}
