@@ -25,7 +25,7 @@ Organizations:
         ID: OrdererMSP
 
         # MSPDir is the filesystem path which contains the MSP configuration
-        MSPDir: crypto-config/orderOrganization/blockNet.com/msp
+        MSPDir: crypto-config/ordererOrganizations/blocknet.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -49,7 +49,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: Org1MSP
 
-        MSPDir: crypto-config/peerOrganizations/org1.blockNet.com/msp
+        MSPDir: crypto-config/peerOrganizations/org1.blocknet.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -70,39 +70,39 @@ Organizations:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0.org1.blockNet.com
+            - Host: peer0.org1.blocknet.com
               Port: 7051
 
-    - &Org2
-        # DefaultOrg defines the organization which is used in the sampleconfig
-        # of the fabric.git development environment
-        Name: Org2MSP
+    # - &Org2
+    #     # DefaultOrg defines the organization which is used in the sampleconfig
+    #     # of the fabric.git development environment
+    #     Name: Org2MSP
 
-        # ID to load the MSP definition as
-        ID: Org2MSP
+    #     # ID to load the MSP definition as
+    #     ID: Org2MSP
 
-        MSPDir: crypto-config/peerOrganizations/org2.blockNet.com/msp
+    #     MSPDir: crypto-config/peerOrganizations/org2.blocknet.com/msp
 
-        # Policies defines the set of policies at this level of the config tree
-        # For organization policies, their canonical path is usually
-        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
-        Policies:
-            Readers:
-                Type: Signature
-                Rule: "OR('Org2MSP.admin', 'Org2MSP.peer', 'Org2MSP.client')"
-            Writers:
-                Type: Signature
-                Rule: "OR('Org2MSP.admin', 'Org2MSP.client')"
-            Admins:
-                Type: Signature
-                Rule: "OR('Org2MSP.admin')"
+    #     # Policies defines the set of policies at this level of the config tree
+    #     # For organization policies, their canonical path is usually
+    #     #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+    #     Policies:
+    #         Readers:
+    #             Type: Signature
+    #             Rule: "OR('Org2MSP.admin', 'Org2MSP.peer', 'Org2MSP.client')"
+    #         Writers:
+    #             Type: Signature
+    #             Rule: "OR('Org2MSP.admin', 'Org2MSP.client')"
+    #         Admins:
+    #             Type: Signature
+    #             Rule: "OR('Org2MSP.admin')"
 
-        AnchorPeers:
-            # AnchorPeers defines the location of peers which can be used
-            # for cross org gossip communication.  Note, this value is only
-            # encoded in the genesis block in the Application section context
-            - Host: peer0.org2.blockNet.com
-              Port: 9051
+    #     AnchorPeers:
+    #         # AnchorPeers defines the location of peers which can be used
+    #         # for cross org gossip communication.  Note, this value is only
+    #         # encoded in the genesis block in the Application section context
+    #         - Host: peer0.org2.blocknet.com
+    #           Port: 9051
 
 ################################################################################
 #
@@ -217,10 +217,10 @@ Orderer: &OrdererDefaults
 
     # Orderer Type: The orderer implementation to start
     # Available types are "solo","kafka"  and "etcdraft"
-    OrdererType: etcdraft
+    OrdererType: solo
 
     Addresses:
-        - orderer1.blockNet.com:7050
+        - orderer.blocknet.com:7050
 
     # Batch Timeout: The amount of time to wait before creating a batch
     BatchTimeout: 2s
@@ -254,26 +254,26 @@ Orderer: &OrdererDefaults
         # a subset of the host:port items enumerated in this list should be
         # replicated under the Orderer.Addresses key above.
         Consenters:
-            - Host: orderer1.blockNet.com
+            - Host: orderer1.blocknet.com
               Port: 7050
-              ClientTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer1.blockNet.com/tls/server.crt
-              ServerTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer1.blockNet.com/tls/server.crt
-            - Host: orderer2.blockNet.com
-              Port: 8050
-              ClientTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer2.blockNet.com/tls/server.crt
-              ServerTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer2.blockNet.com/tls/server.crt
-            - Host: orderer3.blockNet.com
-              Port: 9050
-              ClientTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer3.blockNet.com/tls/server.crt
-              ServerTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer3.blockNet.com/tls/server.crt
-            - Host: orderer4.blockNet.com
-              Port: 10050
-              ClientTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer4.blockNet.com/tls/server.crt
-              ServerTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer4.blockNet.com/tls/server.crt
-            - Host: orderer5.blockNet.com
-              Port: 11050
-              ClientTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer1.blockNet.com/tls/server.crt
-              ServerTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer1.blockNet.com/tls/server.crt
+              ClientTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer1.blocknet.com/tls/server.crt
+              ServerTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer1.blocknet.com/tls/server.crt
+            - Host: orderer2.blocknet.com
+              Port: 7050
+              ClientTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer2.blocknet.com/tls/server.crt
+              ServerTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer2.blocknet.com.com/tls/server.crt
+            - Host: orderer3.blocknet.com
+              Port: 7050
+              ClientTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer3.blocknet.com/tls/server.crt
+              ServerTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer3.blocknet.com/tls/server.crt
+            # - Host: orderer4.blocknet.com
+            #   Port: 7050
+            #   ClientTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer4.blocknet.com/tls/server.crt
+            #   ServerTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer4.blocknet.com/tls/server.crt
+            # - Host: orderer5.blocknet.com
+            #   Port: 7050
+            #   ClientTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer5.blocknet.com/tls/server.crt
+            #   ServerTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer5.blocknet.com/tls/server.crt
 
     # Organizations is the list of orgs which are defined as participants on
     # the orderer side of the network
@@ -352,7 +352,7 @@ Profiles:
             SampleConsortium:
                 Organizations:
                     - *Org1
-                    - *Org2
+                    # - *Org2
     TwoOrgsChannel:
         Consortium: SampleConsortium
         <<: *ChannelDefaults
@@ -360,7 +360,7 @@ Profiles:
             <<: *ApplicationDefaults
             Organizations:
                 - *Org1
-                - *Org2
+                # - *Org2
             Capabilities:
                 <<: *ApplicationCapabilities
 
@@ -373,7 +373,7 @@ Profiles:
             OrdererType: kafka
             Kafka:
                 Brokers:
-                - kafka.blockNet.com:9092
+                - kafka.blocknet.com:9092
 
             Organizations:
             - *OrdererOrg
@@ -387,7 +387,7 @@ Profiles:
             SampleConsortium:
                 Organizations:
                 - *Org1
-                - *Org2
+                # - *Org2
 
     SampleMultiNodeEtcdRaft:
         <<: *ChannelDefaults
@@ -398,32 +398,32 @@ Profiles:
             OrdererType: etcdraft
             EtcdRaft:
                 Consenters:
-                - Host: orderer1.blockNet.com
+                - Host: orderer1.blocknet.com
                   Port: 7050
-                  ClientTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer1.blockNet.com/tls/server.crt
-                  ServerTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer1.blockNet.com/tls/server.crt
-                - Host: orderer2.blockNet.com
-                  Port: 8050
-                  ClientTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer2.blockNet.com/tls/server.crt
-                  ServerTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer2.blockNet.com/tls/server.crt
-                - Host: orderer3.blockNet.com
-                  Port: 9050
-                  ClientTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer3.blockNet.com/tls/server.crt
-                  ServerTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer3.blockNet.com/tls/server.crt
-                - Host: orderer4.blockNet.com
-                  Port: 10050
-                  ClientTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer4.blockNet.com/tls/server.crt
-                  ServerTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer4.blockNet.com/tls/server.crt
-                - Host: orderer5.blockNet.com
-                  Port: 11050
-                  ClientTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer1.blockNet.com/tls/server.crt
-                  ServerTLSCert: crypto-config/orderOrganization/blockNet.com/orderers/orderer1.blockNet.com/tls/server.crt
+                  ClientTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer1.blocknet.com/tls/server.crt
+                  ServerTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer1.blocknet.com/tls/server.crt
+                - Host: orderer2.blocknet.com
+                  Port: 7050
+                  ClientTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer2.blocknet.com/tls/server.crt
+                  ServerTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer2.blocknet.com/tls/server.crt
+                - Host: orderer3.blocknet.com
+                  Port: 7050
+                  ClientTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer3.blocknet.com/tls/server.crt
+                  ServerTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer3.blocknet.com/tls/server.crt
+                # - Host: orderer4.blocknet.com
+                #   Port: 7050
+                #   ClientTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer4.blocknet.com/tls/server.crt
+                #   ServerTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer4.blocknet.com/tls/server.crt
+                # - Host: orderer5.blocknet.com
+                #   Port: 7050
+                #   ClientTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer5.blocknet.com/tls/server.crt
+                #   ServerTLSCert: crypto-config/ordererOrganizations/blocknet.com/orderers/orderer5.blocknet.com/tls/server.crt
             Addresses:
-                - orderer1.blockNet.com:7050
-                - orderer2.blockNet.com:8050
-                - orderer3.blockNet.com:9050
-                - orderer4.blockNet.com:10050
-                - orderer5.blockNet.com:11050
+                - orderer1.blocknet.com:7050
+                - orderer2.blocknet.com:7050
+                - orderer3.blocknet.com:7050
+                # - orderer4.blocknet.com:7050
+                # - orderer5.blocknet.com:7050
 
             Organizations:
             - *OrdererOrg
@@ -437,4 +437,4 @@ Profiles:
             SampleConsortium:
                 Organizations:
                 - *Org1
-                - *Org2
+                # - *Org2

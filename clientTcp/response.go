@@ -1,15 +1,19 @@
 package main
 
 import (
+	"bytes"
+	"log"
 	"net"
-
-	"github.com/blockNet/clientTcp/def"
 )
 
 func sendErrorResponse(conn *net.TCPConn, e error) {
-	conn.Write([]byte(e.Error()))
+	conn.Write([]byte(e.Error() + "\n"))
 }
 
-func sendNormalResponse(conn *net.TCPConn, resp *def.Response) {
-	conn.Write(resp.Msg)
+func sendNormalResponse(conn *net.TCPConn, mes []byte) {
+	var b bytes.Buffer
+	b.Write(mes)
+	b.Write([]byte("\n"))
+	log.Println(string(b.Bytes()))
+	conn.Write(b.Bytes())
 }

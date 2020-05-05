@@ -2,23 +2,68 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"net"
 	"strconv"
 	"strings"
+	"time"
 
+	ds "github.com/blockNet/clientTcp/daemontask"
 	"github.com/blockNet/clientTcp/def"
 )
 
 //消息处理
-func register(conn *net.TCPConn, msg string) {
-	com := strings.Split(msg, ";")
+func tcpHandle(conn *net.TCPConn, com []string) {
 	switch com[0] {
+	case "initCar":
+		initCar(conn, com[1:])
 	case "getCar":
-		GetCar(conn, com[1:])
+		getCar(conn, com[1:])
+	case "getState":
+		getState(conn, com[1:])
+	case "putCarDy":
+		putCarDy(conn, com[1:])
+	case "lockCar":
+		lockCar(conn, com[1:])
+	case "unlock":
+		unLockCar(conn, com[1:])
+	case "queryCarByOwner":
+		queryCarByOwner(conn, com[1:])
+	case "queryCarHistory":
+		queryCarHistry(conn, com[1:])
+	case "deleteCar":
+		deleteCar(conn, com[1:])
+	case "checkRGL":
+		checkRGL(conn, com[1:])
+	case "updataCar":
+		updataCar(conn, com[1:])
+	case "updataRoad":
+		updataRoad(conn, com[1:])
+	case "getRoad":
+		getRoad(conn, com[1:])
+	case "deleteRoad":
+		deleteRoad(conn, com[1:])
+	case "onRoad":
+		onRoad(conn, com[1:])
+	case "updataRGL":
+		updataRGL(conn, com[1:])
+	case "getRGL":
+		getRGL(conn, com[1:])
+	case "carRGL":
+		carRGL(conn, com[1:])
+	case "deleteRGL":
+		dealRGL(conn, com[1:])
+	case "queryHistoryRGL":
+		getHistoryRGL(conn, com[1:])
+	case "TASK":
+		sendNormalResponse(conn, []byte("监听开启..."))
+	case "RESTART_TASK":
+		sendNormalResponse(conn, []byte("监听重启..."))
+	default:
+		sendErrorResponse(conn, errors.New("没有相应的方法！"))
 	}
-
 }
 
 func main() {
@@ -39,21 +84,26 @@ func main() {
 
 		fmt.Println("A client connected :" + tcpConn.RemoteAddr().String())
 		if strings.Split(tcpConn.RemoteAddr().String(), ":")[0] != "127.0.0.1" {
-			fmt.Println([]byte("bad request."))
+			fmt.Println("bad request.")
 			continue
 		} else {
-			fmt.Println([]byte("connecte and server!"))
-			go tcpHandle(tcpConn)
+			fmt.Println("connecte and server!")
+			go register(tcpConn)
 		}
 
 	}
 }
 
 //处理连接
-func tcpHandle(conn *net.TCPConn) {
+func register(conn *net.TCPConn) {
 	ipStr := conn.RemoteAddr().String()
 
+	conn.Write([]byte("connect successful!\n"))
+	c := make(chan string)
+	t := &ds.Task{Controller: c, Conn: conn}
+
 	defer func() {
+		t.StopDaemon()
 		fmt.Println(" Disconnected : " + ipStr)
 		conn.Close()
 	}()
@@ -61,9 +111,22 @@ func tcpHandle(conn *net.TCPConn) {
 	reader := bufio.NewReader(conn)
 	for {
 		message, err := reader.ReadString('\n')
-		if err != nil || err == io.EOF || message == "END" {
+		com := strings.Split(message, ",")
+		fmt.Println("com0:" + com[0])
+		if err != nil || err == io.EOF || com[0] == "EXIT" {
+			fmt.Println("exit and send exit")
+			conn.Write([]byte("EXIT"))
 			break
+		} else if com[0] == "TASK" {
+			task := com[1]
+			t.StartDaemon(task)
+		} else if com[0] == "RESTART_TASK" {
+			task := com[1]
+			t.StopDaemon()
+			time.Sleep(time.Duration(3) * time.Second)
+			t.StartDaemon(task)
 		}
-		register(conn, string(message))
+
+		tcpHandle(conn, com)
 	}
 }

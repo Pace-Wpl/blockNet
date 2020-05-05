@@ -17,24 +17,58 @@ func (t *BlockCarCC) Init(stub shim.ChaincodeStubInterface) peer.Response {
 func (t *BlockCarCC) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 
 	fn, args := stub.GetFunctionAndParameters()
-	if fn == "initCar" {
+	switch fn {
+	case "initCar":
 		return t.initCar(stub, args)
-	} else if fn == "queryCarByOwner" {
-		return t.queryCarByOwner(stub, args)
-	} else if fn == "readCar" {
+	case "readCar":
 		return t.readCar(stub, args)
-	} else if fn == "lock" {
+	case "carState":
+		return t.carState(stub, args)
+	case "lock":
 		return t.lockCar(stub, args)
-	} else if fn == "getHistoryForCar" {
-		return t.getHistoryForCar(stub, args)
-	} else if fn == "deleteCar" {
+	case "unlock":
+		return t.unLockCar(stub, args)
+	case "getlock":
+		return t.getLock(stub, args)
+	case "deleteCar":
 		return t.deleteCar(stub, args)
-	} else if fn == "putCar" {
+	case "putCar":
 		return t.putCarDy(stub, args)
-	} else if fn == "test" {
+	case "updataCar":
+		return t.updataCar(stub, args)
+	case "queryCarByOwner":
+		return t.queryCarByOwner(stub, args)
+	case "getHistoryForCar":
+		return t.getHistoryForCar(stub, args)
+	case "updataRoad":
+		return t.updataRoad(stub, args)
+	case "readRoad":
+		return t.readRoad(stub, args)
+	case "deleteRoad":
+		return t.deleteRoad(stub, args)
+	// case "onRoad":
+	// 	return t.onRoad(stub, args)
+	case "testC":
+		return t.testCollision(stub, args)
+	case "checkCollision":
+		return t.checkCollision(stub, args)
+	case "checkRGL":
+		return t.checkRGL(stub, args)
+	case "updataRGL":
+		return t.updataRGL(stub, args)
+	case "readRGL":
+		return t.readRgl(stub, args)
+	case "carRGL":
+		return t.carRgl(stub, args)
+	case "deleteRGL":
+		return t.dealRGL(stub, args)
+	case "getHistoryRGL":
+		return t.getHistryRgl(stub, args)
+	case "test":
 		return t.testChaincode(stub, args)
-	} else if fn == "testQ" {
+	case "testQ":
 		return t.testChaincodeQ(stub, args)
+	default:
 	}
 	return shim.Error("没有相应的方法！")
 }

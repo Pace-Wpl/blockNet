@@ -10,15 +10,18 @@ OrdererOrgs:
   # ---------------------------------------------------------------------------
   # Orderer
   # ---------------------------------------------------------------------------
-  - Name: Org0
-    Domain: org0.blockNet.com
+  - Name: Orderer
+    Domain: blocknet.com
+    EnableNodeOUs: true
     # ---------------------------------------------------------------------------
     # "Specs" - See PeerOrgs below for complete description
     # ---------------------------------------------------------------------------
     Specs:
-      - Hostname: orderer0
       - Hostname: orderer1
       - Hostname: orderer2
+      - Hostname: orderer3
+      # - Hostname: orderer4
+      # - Hostname: orderer5
 
 # ---------------------------------------------------------------------------
 # "PeerOrgs" - Definition of organizations managing peer nodes
@@ -28,7 +31,7 @@ PeerOrgs:
   # Org1
   # ---------------------------------------------------------------------------
   - Name: Org1
-    Domain: org1.blockNet.com
+    Domain: org1.blocknet.com
     EnableNodeOUs: true
     # ---------------------------------------------------------------------------
     # "Specs"
@@ -77,10 +80,10 @@ PeerOrgs:
   # ---------------------------------------------------------------------------
   # Org2: See "Org1" for full specification
   # ---------------------------------------------------------------------------
-  - Name: Org2
-    Domain: org2.blockNet.com
-    EnableNodeOUs: true
-    Template:
-      Count: 2
-    Users:
-      Count: 1
+  # - Name: Org2
+  #   Domain: org2.blocknet.com
+  #   EnableNodeOUs: true
+  #   Template:
+  #     Count: 2
+  #   Users:
+  #     Count: 1

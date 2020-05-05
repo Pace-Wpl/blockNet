@@ -5,191 +5,121 @@
 
 version: '2'
 
-
 volumes:
-  orderer1.blockNet.com:
-  orderer2.blockNet.com:
-  orderer3.blockNet.com:
-  orderer4.blockNet.com:
-  peer0.org1.blockNet.com:
-  peer1.org1.blockNet.com:
-  peer0.org2.blockNet.com:
-  peer1.org2.blockNet.com:
+  orderer1.blocknet.com:
+  orderer2.blocknet.com:
+  orderer3.blocknet.com:
+  # orderer4.blocknet.com:
+  # orderer5.blocknet.com:
+  peer0.org1.blocknet.com:
+  peer1.org1.blocknet.com:
+  # peer0.org2.blocknet.com:
+  # peer1.org2.blocknet.com:
 
 networks:
   byfn:
 
 services:
 
-  orderer1.blockNet.com:
+  orderer1.blocknet.com:
     extends:
-      file: ./base/orderer-base.yaml
+      file:   base/docker-compose-base.yaml
+      service: orderer1.blocknet.com
+    container_name: orderer1.blocknet.com
+    networks:
+      - byfn
+
+  orderer2.blocknet.com:
+    extends:
+      file: base/peer-base.yaml
       service: orderer-base
-    environment:
-      - ORDERER_GENERAL_LISTENPORT=7050
-    container_name: orderer1.blockNet.com
+    container_name: orderer2.blocknet.com
     networks:
-      - byfn
+    - byfn
     volumes:
-      - ../channel-artifacts/tgenesis.block:/var/hyperledger/orderer/orderer.genesis.block
-      - ../crypto-config/orderOrganization/blockNet.com/orderers/orderer1.blockNet.com/msp:/var/hyperledger/orderer/msp
-      - ../crypto-config/orderOrganization/blockNet.com/orderers/orderer1.blockNet.com/tls/:/var/hyperledger/orderer/tls
-      - ../store/o1:/var/hyperledger/production/orderer
+        - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+        - ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer2.blocknet.com/msp:/var/hyperledger/orderer/msp
+        - ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer2.blocknet.com/tls/:/var/hyperledger/orderer/tls
+        - ../store/orderer2.blocknet.com:/var/hyperledger/production/orderer
     ports:
-      - 7050:7050
+    - 8050:7050
 
-
-
-  orderer2.blockNet.com:
+  orderer3.blocknet.com:
     extends:
-      file: ./base/orderer-base.yaml
+      file: base/peer-base.yaml
       service: orderer-base
-    environment:
-      - ORDERER_GENERAL_LISTENPORT=8050
-    container_name: orderer2.blockNet.com
+    container_name: orderer3.blocknet.com
     networks:
-      - byfn
+    - byfn
     volumes:
-      - ../channel-artifacts/tgenesis.block:/var/hyperledger/orderer/orderer.genesis.block
-      - ../crypto-config/orderOrganization/blockNet.com/orderers/orderer2.blockNet.com/msp:/var/hyperledger/orderer/msp
-      - ../crypto-config/orderOrganization/blockNet.com/orderers/orderer2.blockNet.com/tls/:/var/hyperledger/orderer/tls
-      - ../store/o2:/var/hyperledger/production/orderer
+        - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+        - ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer3.blocknet.com/msp:/var/hyperledger/orderer/msp
+        - ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer3.blocknet.com/tls/:/var/hyperledger/orderer/tls
+        - ../store/orderer3.blocknet.com:/var/hyperledger/production/orderer
     ports:
-      - 8050:8050
-  
-  orderer3.blockNet.com:
-    extends:
-      file: ./base/orderer-base.yaml
-      service: orderer-base
-    environment:
-      - ORDERER_GENERAL_LISTENPORT=9050
-    container_name: orderer3.blockNet.com
-    networks:
-      - byfn
-    volumes:
-      - ../channel-artifacts/tgenesis.block:/var/hyperledger/orderer/orderer.genesis.block
-      - ../crypto-config/orderOrganization/blockNet.com/orderers/orderer3.blockNet.com/msp:/var/hyperledger/orderer/msp
-      - ../crypto-config/orderOrganization/blockNet.com/orderers/orderer3.blockNet.com/tls/:/var/hyperledger/orderer/tls
-      - ../store/o3:/var/hyperledger/production/orderer
-    ports:
-      - 9050:9050
-  
-  orderer4.blockNet.com:
-    extends:
-      file: ./base/orderer-base.yaml
-      service: orderer-base
-    environment:
-      - ORDERER_GENERAL_LISTENPORT=10050
-    container_name: orderer4.blockNet.com
-    networks:
-      - byfn
-    volumes:
-      - ../channel-artifacts/tgenesis.block:/var/hyperledger/orderer/orderer.genesis.block
-      - ../crypto-config/orderOrganization/blockNet.com/orderers/orderer4.blockNet.com/msp:/var/hyperledger/orderer/msp
-      - ../crypto-config/orderOrganization/blockNet.com/orderers/orderer4.blockNet.com/tls/:/var/hyperledger/orderer/tls
-      - ../store/o4:/var/hyperledger/production/orderer
-    ports:
-      - 10050:10050
+    - 9050:7050
 
-  peer0.org1.blockNet.com:
-    container_name: peer0.org1.blockNet.com
-    extends:
-      file:  base/peer-base.yaml
-      service: peer-base
-    environment:
-      # Peer specific variabes
-      - CORE_PEER_ID=peer0.org1.blockNet.com
-      - CORE_PEER_ADDRESS=peer0.org1.blockNet.com:7051
-      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.org1.blockNet.com:7052
-      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org1.blockNet.com:8051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.blockNet.com:7051
-      - CORE_PEER_LOCALMSPID=Org1MSP
-    networks:
-      - byfn
-    volumes :
-      - /var/run/:/host/var/run/
-      - ../crypto-config/peerOrganizations/org1.blockNet.com/peers/peer0.org1.blockNet.com/msp:/etc/hyperledger/fabric/msp
-      - ../crypto-config/peerOrganizations/org1.blockNet.com/peers/peer0.org1.blockNet.com/tls:/etc/hyperledger/fabric/tls
-      - ../store/p0.org1.blockNet.com:/var/hyperledger/production
-    ports: 
-      - 7051:7051
+  # orderer4.blocknet.com:
+  #   extends:
+  #     file: base/peer-base.yaml
+  #     service: orderer-base
+  #   container_name: orderer4.blocknet.com
+  #   networks:
+  #   - byfn
+  #   volumes:
+  #       - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+  #       - ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer4.blocknet.com/msp:/var/hyperledger/orderer/msp
+  #       - ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer4.blocknet.com/tls/:/var/hyperledger/orderer/tls
+  #       - ../store/orderer4.blocknet.com:/var/hyperledger/production/orderer
+  #   ports:
+  #   - 10050:7050
 
-  peer1.org1.blockNet.com:
-    container_name: peer1.org1.blockNet.com
-    extends:
-      file:  base/peer-base.yaml
-      service: peer-base
-    environment:
-      # Peer specific variabes
-      - CORE_PEER_ID=peer1.org1.blockNet.com
-      - CORE_PEER_ADDRESS=peer1.org1.blockNet.com:8051
-      - CORE_PEER_LISTENADDRESS=0.0.0.0:8051
-      - CORE_PEER_CHAINCODEADDRESS=peer1.org1.blockNet.com:8052
-      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:8052
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.blockNet.com:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org1.blockNet.com:8051
-      - CORE_PEER_LOCALMSPID=Org1MSP
-    networks:
-      - byfn
-    volumes :
-      - /var/run/:/host/var/run/
-      - ../crypto-config/peerOrganizations/org1.blockNet.com/peers/peer1.org1.blockNet.com/msp:/etc/hyperledger/fabric/msp
-      - ../crypto-config/peerOrganizations/org1.blockNet.com/peers/peer1.org1.blockNet.com/tls:/etc/hyperledger/fabric/tls
-      - ../store/p1.org1.blockNet.com:/var/hyperledger/production
-    ports: 
-      - 8051:8051
+  # orderer5.blocknet.com:
+  #   extends:
+  #     file: base/peer-base.yaml
+  #     service: orderer-base
+  #   container_name: orderer5.blocknet.com
+  #   networks:
+  #   - byfn
+  #   volumes:
+  #       - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+  #       - ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer5.blocknet.com/msp:/var/hyperledger/orderer/msp
+  #       - ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer5.blocknet.com/tls/:/var/hyperledger/orderer/tls
+  #       - ../store/orderer5.blocknet.com:/var/hyperledger/production/orderer
+  #   ports:
+  #   - 11050:7050
 
-  peer0.org2.blockNet.com:
-    container_name: peer0.org2.blockNet.com
+  peer0.org1.blocknet.com:
+    container_name: peer0.org1.blocknet.com
     extends:
-      file:  base/peer-base.yaml
-      service: peer-base
-    environment:
-      # Peer specific variabes
-      - CORE_PEER_ID=peer0.org2.blockNet.com
-      - CORE_PEER_ADDRESS=peer0.org2.blockNet.com:9051
-      - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.org2.blockNet.com:9052
-      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9052
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org2.blockNet.com:10051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org2.blockNet.com:9051
-      - CORE_PEER_LOCALMSPID=Org2MSP
+      file:  base/docker-compose-base.yaml
+      service: peer0.org1.blocknet.com
     networks:
       - byfn
-    volumes :
-      - /var/run/:/host/var/run/
-      - ../crypto-config/peerOrganizations/org2.blockNet.com/peers/peer0.org2.blockNet.com/msp:/etc/hyperledger/fabric/msp
-      - ../crypto-config/peerOrganizations/org2.blockNet.com/peers/peer0.org2.blockNet.com/tls:/etc/hyperledger/fabric/tls
-      - ../store/p0.org2.blockNet.com:/var/hyperledger/production
-    ports: 
-      - 9051:9051
 
-  peer1.org2.blockNet.com:
-    container_name: peer1.org2.blockNet.com
+  peer1.org1.blocknet.com:
+    container_name: peer1.org1.blocknet.com
     extends:
-      file:  base/peer-base.yaml
-      service: peer-base
-    environment:
-      # Peer specific variabes
-      - CORE_PEER_ID=peer1.org2.blockNet.com
-      - CORE_PEER_ADDRESS=peer1.org2.blockNet.com:10051
-      - CORE_PEER_LISTENADDRESS=0.0.0.0:10051
-      - CORE_PEER_CHAINCODEADDRESS=peer1.org2.blockNet.com:10052
-      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:10052
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org2.blockNet.com:9051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org2.blockNet.com:10051
-      - CORE_PEER_LOCALMSPID=Org2MSP
+      file:  base/docker-compose-base.yaml
+      service: peer1.org1.blocknet.com
     networks:
       - byfn
-    volumes :
-      - /var/run/:/host/var/run/
-      - ../crypto-config/peerOrganizations/org2.blockNet.com/peers/peer1.org2.blockNet.com/msp:/etc/hyperledger/fabric/msp
-      - ../crypto-config/peerOrganizations/org2.blockNet.com/peers/peer1.org2.blockNet.com/tls:/etc/hyperledger/fabric/tls
-      - ../store/p1.org2.blockNet.com:/var/hyperledger/production
-    ports: 
-      - 10051:10051
+
+  # peer0.org2.blocknet.com:
+  #   container_name: peer0.org2.blocknet.com
+  #   extends:
+  #     file:  base/docker-compose-base.yaml
+  #     service: peer0.org2.blocknet.com
+  #   networks:
+  #     - byfn
+
+  # peer1.org2.blocknet.com:
+  #   container_name: peer1.org2.blocknet.com
+  #   extends:
+  #     file:  base/docker-compose-base.yaml
+  #     service: peer1.org2.blocknet.com
+  #   networks:
+  #     - byfn
 
   cli:
     container_name: cli
@@ -197,34 +127,36 @@ services:
     tty: true
     stdin_open: true
     environment:
+      - SYS_CHANNEL=$SYS_CHANNEL
       - GOPATH=/opt/gopath
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-    #  - CORE_LOGGING_LEVEL=DEBUG
-      - CORE_LOGGING_LEVEL=INFO
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_ID=cli
-      - CORE_PEER_ADDRESS=peer0.org1.blockNet.com:7051
+      - CORE_PEER_ADDRESS=peer0.org1.blocknet.com:7051
       - CORE_PEER_LOCALMSPID=Org1MSP
       - CORE_PEER_TLS_ENABLED=true
-      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.blockNet.com/peers/peer0.org1.blockNet.com/tls/server.crt
-      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.blockNet.com/peers/peer0.org1.blockNet.com/tls/server.key
-      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.blockNet.com/peers/peer0.org1.blockNet.com/tls/ca.crt
-      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.blockNet.com/users/Admin@org1.blockNet.com/msp
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.blocknet.com/peers/peer0.org1.blocknet.com/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.blocknet.com/peers/peer0.org1.blocknet.com/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.blocknet.com/peers/peer0.org1.blocknet.com/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.blocknet.com/users/Admin@org1.blocknet.com/msp
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: /bin/bash
     volumes:
         - /var/run/:/host/var/run/
-        - ../chaincode/:/opt/gopath/src/github.com/chaincode
+        - ./../chaincode/:/opt/gopath/src/github.com/chaincode
         - ../crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
         - ../scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
         - ../channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
     depends_on:
-      - orderer1.blockNet.com
-      - orderer2.blockNet.com
-      - orderer3.blockNet.com
-      - orderer4.blockNet.com
-      - peer0.org1.blockNet.com
-      - peer1.org1.blockNet.com
-      - peer0.org2.blockNet.com
-      - peer1.org2.blockNet.com
+      - orderer1.blocknet.com
+      - orderer2.blocknet.com
+      - orderer3.blocknet.com
+      # - orderer4.blocknet.com
+      # - orderer5.blocknet.com
+      - peer0.org1.blocknet.com
+      - peer1.org1.blocknet.com
+      # - peer0.org2.blocknet.com
+      # - peer1.org2.blocknet.com
     networks:
       - byfn

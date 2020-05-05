@@ -63,12 +63,12 @@ client:
   # Some SDKs support pluggable KV stores, the properties under "credentialStore"
   # are implementation specific
   credentialStore:
-    path: /tmp/blockNet-store
+    path: /tmp/blocknet-store
 
     # [Optional]. Specific to the CryptoSuite implementation used by GO SDK. Software-based implementations
     # requiring a key store. PKCS#11 based implementations does not.
     cryptoStore:
-      path: /tmp/blockNet-msp
+      path: /tmp/blocknet-msp
 
    # BCCSP config for the client. Used by GO SDK.
   BCCSP:
@@ -109,7 +109,7 @@ channels:
 
     # Required. list of peers from participating orgs
     peers:
-      peer0.org1.blockNet.com:
+      peer0.org1.blocknet.com:
         # [Optional]. will this peer be sent transaction proposals for endorsement? The peer must
         # have the chaincode installed. The app can also use this property to decide which peers
         # to send the chaincode install request. Default: true
@@ -129,23 +129,23 @@ channels:
         # Default: true
         eventSource: true
 
-      peer1.org1.blockNet.com:
+      peer1.org1.blocknet.com:
         endorsingPeer: true
         chaincodeQuery: true
         ledgerQuery: true
         eventSource: true
 
-      peer0.org2.blockNet.com:
-        endorsingPeer: true
-        chaincodeQuery: true
-        ledgerQuery: true
-        eventSource: true
+      # peer0.org2.blocknet.com:
+      #   endorsingPeer: true
+      #   chaincodeQuery: true
+      #   ledgerQuery: true
+      #   eventSource: true
 
-      peer1.org2.blockNet.com:
-        endorsingPeer: true
-        chaincodeQuery: true
-        ledgerQuery: true
-        eventSource: true
+      # peer1.org2.blocknet.com:
+      #   endorsingPeer: true
+      #   chaincodeQuery: true
+      #   ledgerQuery: true
+      #   eventSource: true
 
     policies:
       #[Optional] options for retrieving channel configuration blocks
@@ -224,20 +224,20 @@ channels:
 organizations:
   org1:
     mspid: Org1MSP
-    cryptoPath: peerOrganizations/org1.blockNet.com/users/{userName}@org1.blockNet.com/msp
+    cryptoPath: peerOrganizations/org1.blocknet.com/users/{userName}@org1.blocknet.com/msp
     peers:
-      - peer0.org1.blockNet.com
-      - peer1.org1.blockNet.com
+      - peer0.org1.blocknet.com
+      - peer1.org1.blocknet.com
 
     users:
       User1:
         cert: 
-          path: ../crypto-config/peerOrganizations/org1.blockNet.com/users/User1@org1.blockNet.com/msp/signcerts/cert.pem
+          path: ../crypto-config/peerOrganizations/org1.blocknet.com/users/User1@org1.blocknet.com/msp/signcerts/User1@org1.blocknet.com-cert.pem
         
 
       Admin:
         cert:
-          path: ../crypto-config/peerOrganizations/org1.blockNet.com/users/Admin@org1.blockNet.com/msp/signcerts/cert.pem
+          path: ../crypto-config/peerOrganizations/org1.blocknet.com/users/Admin@org1.blocknet.com/msp/signcerts/Admin@org1.blocknet.com-cert.pem
               
 
     # [Optional]. Certificate Authorities issue certificates for identification purposes in a Fabric based
@@ -248,48 +248,48 @@ organizations:
     certificateAuthorities:
       - ca-org1
 
-  org2:
-    mspid: Org2MSP
-    cryptoPath: peerOrganizations/org2.blockNet.com/users/{userName}@org2.blockNet.com/msp
-    peers:
-      - peer0.org2.blockNet.com
-      - peer1.org2.blockNet.com
+  # org2:
+  #   mspid: Org2MSP
+  #   cryptoPath: peerOrganizations/org2.blocknet.com/users/{userName}@org2.blocknet.com/msp
+  #   peers:
+  #     - peer0.org2.blocknet.com
+  #     - peer1.org2.blocknet.com
 
-    users:
-      User1:
-        cert: 
-          path: ../crypto-config/peerOrganizations/org2.blockNet.com/users/User1@org2.blockNet.com/msp/signcerts/cert.pem
+  #   users:
+  #     User1:
+  #       cert: 
+  #         path: ../crypto-config/peerOrganizations/org2.blocknet.com/users/User1@org2.blocknet.com/msp/signcerts/User1@org2.blocknet.com-cert.pem
         
           
-      Admin:
-        cert:
-          path: ../crypto-config/peerOrganizations/org2.blockNet.com/users/Admin@org2.blockNet.com/msp/signcerts/cert.pem
+  #     Admin:
+  #       cert:
+  #         path: ../crypto-config/peerOrganizations/org2.blocknet.com/users/Admin@org2.blocknet.com/msp/signcerts/Admin@org2.blocknet.com-cert.pem
 
-    # [Optional]. Certificate Authorities issue certificates for identification purposes in a Fabric based
-    # network. Typically certificates provisioning is done in a separate process outside of the
-    # runtime network. Fabric-CA is a special certificate authority that provides a REST APIs for
-    # dynamic certificate management (enroll, revoke, re-enroll). The following section is only for
-    # Fabric-CA servers.
-    certificateAuthorities:
-      - ca-org2
+  #   # [Optional]. Certificate Authorities issue certificates for identification purposes in a Fabric based
+  #   # network. Typically certificates provisioning is done in a separate process outside of the
+  #   # runtime network. Fabric-CA is a special certificate authority that provides a REST APIs for
+  #   # dynamic certificate management (enroll, revoke, re-enroll). The following section is only for
+  #   # Fabric-CA servers.
+  #   certificateAuthorities:
+  #     - ca-org2
 
-  ordererorg:
-    mspid: OrdererMSP
-    cryptoPath: ordererOrganizations/blockNet.com/users/{userName}@blockNet.com/msp
-    orderers:
-      - orderer1.blockNet.com
-      - orderer2.blockNet.com
-      - orderer3.blockNet.com
-      - orderer4.blockNet.com
+  # ordererorg:
+  #   mspid: OrdererMSP
+  #   cryptoPath: ordererOrganizations/blockNet.com/users/{userName}@blockNet.com/msp
+  #   orderers:
+  #     - orderer1.blockNet.com
+  #     - orderer2.blockNet.com
+  #     - orderer3.blockNet.com
+  #     - orderer4.blockNet.com
 
 
-    users:
-      Admin:
-        cert:
-          path: ../crypto-config/orderOrganization/blockNet.com/users/Admin@blockNet.com/msp/signcerts/cert.pem
+  #   users:
+  #     Admin:
+  #       cert:
+  #         path: ../crypto-config/orderOrganization/blockNet.com/users/Admin@blockNet.com/msp/signcerts/cert.pem
 
-    certificateAuthorities:
-      - ca-orderer
+  #   certificateAuthorities:
+  #     - ca-orderer
 
 
 #
@@ -298,13 +298,13 @@ organizations:
 # SDK is implementation specific. Consult each SDK's documentation for its handling of orderers.
 #
 orderers:
-  orderer1.blockNet.com:
+  orderer1.blocknet.com:
     url: localhost:7050
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
     grpcOptions:
-      ssl-target-name-override: orderer1.blockNet.com
+      ssl-target-name-override: orderer1.blocknet.com
       # These parameters should be set in coordination with the keepalive policy on the server,
       # as incompatible settings can result in closing of connection.
       # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
@@ -317,36 +317,36 @@ orderers:
 
     tlsCACerts:
       # Certificate location absolute path
-      path: ${GOPATH}/src/github.com/blockNet/crypto-config/orderOrganization/blockNet.com/orderers/orderer1.blockNet.com/msp/tlscacerts/tlsca.blockNet.com-cert.pem
+      path: ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer1.blocknet.com/msp/tlscacerts/tlsca.blocknet.com-cert.pem
 
-  orderer2.blockNet.com:
+  orderer2.blocknet.com:
     url: localhost:7050:8050
 
-    # these are standard properties defined by the gRPC library
-    # they will be passed in as-is to gRPC client constructor
+  #   # these are standard properties defined by the gRPC library
+  #   # they will be passed in as-is to gRPC client constructor
     grpcOptions:
-      ssl-target-name-override: orderer2.blockNet.com
-      # These parameters should be set in coordination with the keepalive policy on the server,
-      # as incompatible settings can result in closing of connection.
-      # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
+      ssl-target-name-override: orderer2.blocknet.com
+  #     # These parameters should be set in coordination with the keepalive policy on the server,
+  #     # as incompatible settings can result in closing of connection.
+  #     # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
       keep-alive-time: 0s
       keep-alive-timeout: 20s
       keep-alive-permit: false
       fail-fast: false
-      # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
+  #     # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
       allow-insecure: false
 
     tlsCACerts:
       # Certificate location absolute path
-      path: ${GOPATH}/src/github.com/blockNet/crypto-config/orderOrganization/blockNet.com/orderers/orderer2.blockNet.com/msp/tlscacerts/tlsca.blockNet.com-cert.pem
+      path: ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer2.blocknet.com/msp/tlscacerts/tlsca.blocknet.com-cert.pem
 
-  orderer3.blockNet.com:
+  orderer3.blocknet.com:
     url: localhost:9050
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
     grpcOptions:
-      ssl-target-name-override: orderer3.blockNet.com
+      ssl-target-name-override: orderer3.blocknet.com
       # These parameters should be set in coordination with the keepalive policy on the server,
       # as incompatible settings can result in closing of connection.
       # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
@@ -359,42 +359,63 @@ orderers:
 
     tlsCACerts:
       # Certificate location absolute path
-      path: ${GOPATH}/src/github.com/blockNet/crypto-config/orderOrganization/blockNet.com/orderers/orderer3.blockNet.com/msp/tlscacerts/tlsca.blockNet.com-cert.pem
+      path: ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer3.blocknet.com/msp/tlscacerts/tlsca.blocknet.com-cert.pem
 
-  orderer4.blockNet.com:
-    url: localhost:1050
+  # orderer4.blocknet.com:
+  #   url: localhost:10050
 
-    # these are standard properties defined by the gRPC library
-    # they will be passed in as-is to gRPC client constructor
-    grpcOptions:
-      ssl-target-name-override: orderer4.blockNet.com
-      # These parameters should be set in coordination with the keepalive policy on the server,
-      # as incompatible settings can result in closing of connection.
-      # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
-      keep-alive-time: 0s
-      keep-alive-timeout: 20s
-      keep-alive-permit: false
-      fail-fast: false
-      # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
-      allow-insecure: false
+  #   # these are standard properties defined by the gRPC library
+  #   # they will be passed in as-is to gRPC client constructor
+  #   grpcOptions:
+  #     ssl-target-name-override: orderer4.blocknet.com
+  #     # These parameters should be set in coordination with the keepalive policy on the server,
+  #     # as incompatible settings can result in closing of connection.
+  #     # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
+  #     keep-alive-time: 0s
+  #     keep-alive-timeout: 20s
+  #     keep-alive-permit: false
+  #     fail-fast: false
+  #     # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
+  #     allow-insecure: false
 
-    tlsCACerts:
-      # Certificate location absolute path
-      path: ${GOPATH}/src/github.com/blockNet/crypto-config/orderOrganization/blockNet.com/orderers/orderer4.blockNet.com/msp/tlscacerts/tlsca.blockNet.com-cert.pem
+  #   tlsCACerts:
+  #     # Certificate location absolute path
+  #     path: ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer4.blocknet.com/msp/tlscacerts/tlsca.blocknet.com-cert.pem
+
+  # orderer5.blocknet.com:
+  #   url: localhost:11050
+
+  #   # these are standard properties defined by the gRPC library
+  #   # they will be passed in as-is to gRPC client constructor
+  #   grpcOptions:
+  #     ssl-target-name-override: orderer5.blocknet.com
+  #     # These parameters should be set in coordination with the keepalive policy on the server,
+  #     # as incompatible settings can result in closing of connection.
+  #     # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
+  #     keep-alive-time: 0s
+  #     keep-alive-timeout: 20s
+  #     keep-alive-permit: false
+  #     fail-fast: false
+  #     # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
+  #     allow-insecure: false
+
+  #   tlsCACerts:
+  #     # Certificate location absolute path
+  #     path: ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer5.blocknet.com/msp/tlscacerts/tlsca.blocknet.com-cert.pem
 
 #
 # List of peers to send various requests to, including endorsement, query
 # and event listener registration.
 #
 peers:
-  peer0.org1.blockNet.com:
+  peer0.org1.blocknet.com:
     # this URL is used to send endorsement and query requests
     url: localhost:7051
     # eventUrl is only needed when using eventhub (default is delivery service)
     # eventUrl: localhost:7053
 
     grpcOptions:
-      ssl-target-name-override: peer0.org1.blockNet.com
+      ssl-target-name-override: peer0.org1.blocknet.com
       # These parameters should be set in coordination with the keepalive policy on the server,
       # as incompatible settings can result in closing of connection.
       # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
@@ -407,17 +428,16 @@ peers:
 
     tlsCACerts:
       # Certificate location absolute path
-      path: ${GOPATH}/src/github.com/blockNet/crypto-config/peerOrganizations/org1.blockNet.com/tlsca/tlsca.org1.blockNet.com-cert.pem
-      # path: ${GOPATH}/src/github.com/blockNet/crypto-config/orderOrganization/blockNet.com/orderers/orderer4.blockNet.com/msp/tlscacerts/tlsca.blockNet.com-cert.pem
+      path: ../crypto-config/peerOrganizations/org1.blocknet.com/tlsca/tlsca.org1.blocknet.com-cert.pem
 
-  peer1.org1.blockNet.com:
+  peer1.org1.blocknet.com:
     # this URL is used to send endorsement and query requests
     url: localhost:8051
     # eventUrl is only needed when using eventhub (default is delivery service)
     # eventUrl: localhost:8053
 
     grpcOptions:
-      ssl-target-name-override: peer1.org1.blockNet.com
+      ssl-target-name-override: peer1.org1.blocknet.com
       # These parameters should be set in coordination with the keepalive policy on the server,
       # as incompatible settings can result in closing of connection.
       # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
@@ -430,54 +450,51 @@ peers:
 
     tlsCACerts:
       # Certificate location absolute path
-      path: ${GOPATH}/src/github.com/blockNet/crypto-config/peerOrganizations/org1.blockNet.com/tlsca/tlsca.org1.blockNet.com-cert.pem
-      # path: ${GOPATH}/src/github.com/blockNet/crypto-config/orderOrganization/blockNet.com/orderers/orderer4.blockNet.com/msp/tlscacerts/tlsca.blockNet.com-cert.pem
+      path: ../crypto-config/peerOrganizations/org1.blocknet.com/tlsca/tlsca.org1.blocknet.com-cert.pem
 
-  peer0.org2.blockNet.com:
-    # this URL is used to send endorsement and query requests
-    url: localhost:9051
-    # eventUrl is only needed when using eventhub (default is delivery service)
-    # eventUrl: localhost:9053
+  # peer0.org2.blocknet.com:
+  #   # this URL is used to send endorsement and query requests
+  #   url: localhost:9051
+  #   # eventUrl is only needed when using eventhub (default is delivery service)
+  #   eventUrl: localhost:9053
 
-    grpcOptions:
-      ssl-target-name-override: peer0.org2.blockNet.com
-      # These parameters should be set in coordination with the keepalive policy on the server,
-      # as incompatible settings can result in closing of connection.
-      # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
-      keep-alive-time: 0s
-      keep-alive-timeout: 20s
-      keep-alive-permit: false
-      fail-fast: false
-      # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
-      allow-insecure: false
+  #   grpcOptions:
+  #     ssl-target-name-override: peer0.org2.blocknet.com
+  #     # These parameters should be set in coordination with the keepalive policy on the server,
+  #     # as incompatible settings can result in closing of connection.
+  #     # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
+  #     keep-alive-time: 0s
+  #     keep-alive-timeout: 20s
+  #     keep-alive-permit: false
+  #     fail-fast: false
+  #     # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
+  #     allow-insecure: false
 
-    tlsCACerts:
-      # Certificate location absolute path
-      path: ${GOPATH}/src/github.com/blockNet/crypto-config/peerOrganizations/org2.blockNet.com/tlsca/tlsca.org2.blockNet.com-cert.pem
-      # path: ${GOPATH}/src/github.com/blockNet/crypto-config/orderOrganization/blockNet.com/orderers/orderer4.blockNet.com/msp/tlscacerts/tlsca.blockNet.com-cert.pem
+  #   tlsCACerts:
+  #     # Certificate location absolute path
+  #     path: ../crypto-config/peerOrganizations/org2.blocknet.com/tlsca/tlsca.org2.blocknet.com-cert.pem
 
-  peer1.org2.blockNet.com:
-    # this URL is used to send endorsement and query requests
-    url: localhost:10051
-    # eventUrl is only needed when using eventhub (default is delivery service)
-    # eventUrl: localhost:10053
+  # peer1.org2.blocknet.com:
+  #   # this URL is used to send endorsement and query requests
+  #   url: localhost:10051
+  #   # eventUrl is only needed when using eventhub (default is delivery service)
+  #   eventUrl: localhost:10053
 
-    grpcOptions:
-      ssl-target-name-override: peer1.org2.blockNet.com
-      # These parameters should be set in coordination with the keepalive policy on the server,
-      # as incompatible settings can result in closing of connection.
-      # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
-      keep-alive-time: 0s
-      keep-alive-timeout: 20s
-      keep-alive-permit: false
-      fail-fast: false
-      # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
-      allow-insecure: false
+  #   grpcOptions:
+  #     ssl-target-name-override: peer1.org2.blocknet.com
+  #     # These parameters should be set in coordination with the keepalive policy on the server,
+  #     # as incompatible settings can result in closing of connection.
+  #     # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
+  #     keep-alive-time: 0s
+  #     keep-alive-timeout: 20s
+  #     keep-alive-permit: false
+  #     fail-fast: false
+  #     # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
+  #     allow-insecure: false
 
-    tlsCACerts:
-      # Certificate location absolute path
-      path: ${GOPATH}/src/github.com/blockNet/crypto-config/peerOrganizations/org2.blockNet.com/tlsca/tlsca.org2.blockNet.com-cert.pem
-      # path: ${GOPATH}/src/github.com/blockNet/crypto-config/orderOrganization/blockNet.com/orderers/orderer4.blockNet.com/msp/tlscacerts/tlsca.blockNet.com-cert.pem
+  #   tlsCACerts:
+  #     # Certificate location absolute path
+  #     path: ../crypto-config/peerOrganizations/org2.blocknet.com/tlsca/tlsca.org2.blocknet.com-cert.pem
 
 #
 # Fabric-CA is a special kind of Certificate Authority provided by Hyperledger Fabric which allows
@@ -489,7 +506,7 @@ certificateAuthorities:
     url: http://ca-org1:7054
     tlsCACerts:
       # Certificate location absolute path
-      path: ../crypto-config/peerOrganizations/org1.blockNet.com/ca/ca.org1.blockNet.com-cert.pem
+      path: ../crypto-config/peerOrganizations/org1.blocknet.com/tlsca/tlsca.org1.blocknet.com-cert.pem
 
     # Fabric-CA supports dynamic user enrollment via REST APIs. A "root" user, a.k.a registrar, is
     # needed to enroll and invoke new users.
@@ -499,25 +516,25 @@ certificateAuthorities:
     # [Optional] The optional name of the CA.
     caName: ca-org1
 
-  ca-org2:
-    url: http://ca-org2:8054
-    tlsCACerts:
-      # Certificate location absolute path
-      path: ../crypto-config/peerOrganizations/org2.blockNet.com/ca/ca.org2.blockNet.com-cert.pem
+  # ca-org2:
+  #   url: http://ca-org2:8054
+  #   tlsCACerts:
+  #     # Certificate location absolute path
+  #     path: ../crypto-config/peerOrganizations/org2.blocknet.com/tlsca/tlsca.org2.blocknet.com-cert.pem
 
-    # Fabric-CA supports dynamic user enrollment via REST APIs. A "root" user, a.k.a registrar, is
-    # needed to enroll and invoke new users.
-    registrar:
-      enrollId: admin
-      enrollSecret: adminpw
-    # [Optional] The optional name of the CA.
-    caName: ca-org2
+  #   # Fabric-CA supports dynamic user enrollment via REST APIs. A "root" user, a.k.a registrar, is
+  #   # needed to enroll and invoke new users.
+  #   registrar:
+  #     enrollId: admin
+  #     enrollSecret: adminpw
+  #   # [Optional] The optional name of the CA.
+  #   caName: ca-org2
 
   ca-orderer:
     url: http://ca-orderer:9054
     tlsCACerts:
       # Certificate location absolute path
-      path: ../crypto-config/orderOrganization/blockNet.com/msp/cacerts/localhost-9054-ca-orderer.pem
+      path: ../crypto-config/ordererOrganizations/blocknet.com/msp/tlscacerts/tlsca.blocknet.com-cert.pem
 
     # Fabric-CA supports dynamic user enrollment via REST APIs. A "root" user, a.k.a registrar, is
     # needed to enroll and invoke new users.
@@ -539,59 +556,59 @@ certificateAuthorities:
 #entityMatchers:
 entityMatchers:
   peer:
-    - pattern: (\w*)peer0.org1.blockNet.com(\w*)
+    - pattern: (\w*)peer0.org1.blocknet.com(\w*)
       urlSubstitutionExp: localhost:7051
       eventUrlSubstitutionExp: localhost:7053
-      sslTargetOverrideUrlSubstitutionExp: peer0.org1.blockNet.com
-      mappedHost: peer0.org1.blockNet.com
+      sslTargetOverrideUrlSubstitutionExp: peer0.org1.blocknet.com
+      mappedHost: peer0.org1.blocknet.com
 
-    - pattern: (\w*)peer1.org1.blockNet.com(\w*)
+    - pattern: (\w*)peer1.org1.blocknet.com(\w*)
       urlSubstitutionExp: localhost:8051
       eventUrlSubstitutionExp: localhost:8053
-      sslTargetOverrideUrlSubstitutionExp: peer1.org1.blockNet.com
-      mappedHost: peer1.org1.blockNet.com
+      sslTargetOverrideUrlSubstitutionExp: peer1.org1.blocknet.com
+      mappedHost: peer1.org1.blocknet.com
     
-    - pattern: (\w*)peer0.org2.blockNet.com(\w*)
-      urlSubstitutionExp: localhost:9051
-      eventUrlSubstitutionExp: localhost:9053
-      sslTargetOverrideUrlSubstitutionExp: peer0.org2.blockNet.com
-      mappedHost: peer0.org2.blockNet.com
+    # - pattern: (\w*)peer0.org2.blocknet.com(\w*)
+    #   urlSubstitutionExp: localhost:9051
+    #   eventUrlSubstitutionExp: localhost:9053
+    #   sslTargetOverrideUrlSubstitutionExp: peer0.org2.blocknet.com
+    #   mappedHost: peer0.org2.blocknet.com
 
-    - pattern: (\w*)peer1.org2.blockNet.com(\w*)
-      urlSubstitutionExp: localhost:10051
-      eventUrlSubstitutionExp: localhost:10053
-      sslTargetOverrideUrlSubstitutionExp: peer1.org2.blockNet.com
-      mappedHost: peer1.org2.blockNet.com
+    # - pattern: (\w*)peer1.org2.blocknet.com(\w*)
+    #   urlSubstitutionExp: localhost:10051
+    #   eventUrlSubstitutionExp: localhost:10053
+    #   sslTargetOverrideUrlSubstitutionExp: peer1.org2.blocknet.com
+    #   mappedHost: peer1.org2.blocknet.com
 
   orderer:
-    - pattern: (\w*)orderer1.blockNet.com(\w*)
+    - pattern: (\w*)orderer1.blocknet.com(\w*)
       urlSubstitutionExp: localhost:7050
-      sslTargetOverrideUrlSubstitutionExp: orderer1.blockNet.com
-      mappedHost: orderer1.blockNet.com
+      sslTargetOverrideUrlSubstitutionExp: orderer1.blocknet.com
+      mappedHost: orderer1.blocknet.com
 
-    - pattern: (\w*)orderer2.blockNet.com(\w*)
+    - pattern: (\w*)orderer2.blocknet.com(\w*)
       urlSubstitutionExp: localhost:8050
-      sslTargetOverrideUrlSubstitutionExp: orderer2.blockNet.com
-      mappedHost: orderer2.blockNet.com
+      sslTargetOverrideUrlSubstitutionExp: orderer2.blocknet.com
+      mappedHost: orderer2.blocknet.com
 
-    - pattern: (\w*)orderer3.blockNet.com(\w*)
+    - pattern: (\w*)orderer3.blocknet.com(\w*)
       urlSubstitutionExp: localhost:9050
-      sslTargetOverrideUrlSubstitutionExp: orderer3.blockNet.com
-      mappedHost: orderer3.blockNet.com
+      sslTargetOverrideUrlSubstitutionExp: orderer3.blocknet.com
+      mappedHost: orderer3.blocknet.com
 
-    - pattern: (\w*)orderer4.blockNet.com(\w*)
-      urlSubstitutionExp: localhost:10050
-      sslTargetOverrideUrlSubstitutionExp: orderer4.blockNet.com
-      mappedHost: orderer4.blockNet.com
+    # - pattern: (\w*)orderer4.blocknet.com(\w*)
+    #   urlSubstitutionExp: localhost:10050
+    #   sslTargetOverrideUrlSubstitutionExp: orderer4.blocknet.com
+    #   mappedHost: orderer4.blocknet.com
 
   certificateAuthorities:
     - pattern: (\w*)ca-org1(\w*)
       urlSubstitutionExp: http://localhost:7054
       mappedHost: ca-org1
 
-    - pattern: (\w*)ca-org2(\w*)
-      urlSubstitutionExp: http://localhost:8054
-      mappedHost: ca-org2
+    # - pattern: (\w*)ca-org2(\w*)
+    #   urlSubstitutionExp: http://localhost:8054
+    #   mappedHost: ca-org2
 
     - pattern: (\w*)ca-orderer(\w*)
       urlSubstitutionExp: http://localhost:9054
