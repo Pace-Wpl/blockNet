@@ -203,6 +203,8 @@ func LockCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	resp, err := service.LockCar(lock)
 	if err != nil {
 		fmt.Println(err)
+		sendNormalResponse(w, "")
+		return
 	}
 
 	sendNormalResponse(w, resp)
@@ -220,9 +222,10 @@ func UnLockCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	lock := &def.LockCar{ObjectType: "carLock", CarNum: ubody.CarNum, Lc: false, Certificate: ubody.Certificate}
 	resp, err := service.UnLockCar(lock)
 	if err != nil {
-		fmt.Println(err)
+		sendNormalResponse(w, "")
+		return
 	}
-
+	fmt.Println("send normal resp")
 	sendNormalResponse(w, resp)
 }
 
