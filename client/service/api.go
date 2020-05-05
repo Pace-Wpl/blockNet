@@ -120,11 +120,6 @@ func PutCarDy(carDy *def.CarDyReq) error {
 		return err
 	}
 
-	err = eventResult(notifier, eventID)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 

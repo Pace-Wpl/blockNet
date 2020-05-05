@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
@@ -27,10 +26,7 @@ func init() {
 		panic(err.Error())
 	}
 
-	info := &def.InitInfo{ChannelID: def.CHAINNEL_ID, UserName: def.USER_NAME, OrgName: def.ORG_NAME,
-		ChannelConfig: def.CHANNEL_CONFIG, OrgAdmin: def.ORG_ADMIN, OrdererOrgName: def.ORDERER_ORG_NAME,
-		ChaincodeID: def.CHAINCODE_ID, ChaincodePath: def.CHAINCODE_PATH, ChaincodeGoPath: os.Getenv("GOPATH"),
-	}
+	info := &def.InitInfo{ChannelID: def.CHAINNEL_ID, UserName: def.USER_NAME, OrgName: def.ORG_NAME}
 
 	channelClient, err := GetChannelClient(sdk, info)
 	if err != nil {
