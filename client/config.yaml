@@ -320,7 +320,7 @@ orderers:
       path: ../crypto-config/ordererOrganizations/blocknet.com/orderers/orderer1.blocknet.com/msp/tlscacerts/tlsca.blocknet.com-cert.pem
 
   orderer2.blocknet.com:
-    url: localhost:7050:8050
+    url: localhost:8050
 
   #   # these are standard properties defined by the gRPC library
   #   # they will be passed in as-is to gRPC client constructor
