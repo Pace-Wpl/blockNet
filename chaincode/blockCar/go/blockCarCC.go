@@ -50,6 +50,12 @@ func (t *BlockCarCC) initCar(stub shim.ChaincodeStubInterface, args []string) pe
 		return shim.Error("car  已经存在！")
 	}
 
+	//判断 cer 是否存在
+	exit, err := CerExit(stub, carInfo.Certificate)
+	if !exit || err != nil {
+		return shim.Error("cer 不存在!")
+	}
+
 	carInfo.ObjectType = "carInfomation"
 	carJsonAsBytes, err := json.Marshal(carInfo)
 	if err != nil {
@@ -78,6 +84,24 @@ func (t *BlockCarCC) initCar(stub shim.ChaincodeStubInterface, args []string) pe
 	}
 
 	return shim.Success(nil)
+}
+
+//判断证书是否存在;
+//args: certs
+func CerExit(stub shim.ChaincodeStubInterface, cert string) (bool, error) {
+	queryStr := fmt.Sprintf("{\"selector\":{\"objectType\":\"user\",\"certificate\":\"%s\"}}", cert)
+
+	resultIterator, err := stub.GetQueryResult(queryStr)
+	if err != nil {
+		return false, err
+	}
+	defer resultIterator.Close()
+
+	if resultIterator.HasNext() {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 //updataCar 更新汽车静态信息;
@@ -460,4 +484,56 @@ func (t *BlockCarCC) getLock(stub shim.ChaincodeStubInterface, args []string) pe
 	}
 
 	return shim.Success(LockJSON)
+}
+
+//args: json user,
+func (t *BlockCarCC) register(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	user := &def.User{}
+	if err := json.Unmarshal([]byte(args[0]), user); err != nil {
+		return shim.Error(def.ErrorBadRequest)
+	}
+
+	//判断 usr 是否存在
+	uAsBytes, err := stub.GetState(user.UserName)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	if uAsBytes != nil {
+		return shim.Error("user name had exeit！")
+	}
+
+	err = stub.PutState(user.UserName, []byte(args[0]))
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	err = stub.SetEvent(args[1], []byte{}) //set event init
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(nil)
+}
+
+func (t *BlockCarCC) getUser(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	uRq := &def.UserReq{}
+	if err := json.Unmarshal([]byte(args[0]), uRq); err != nil {
+		return shim.Error(def.ErrorBadRequest)
+	}
+
+	uAsBytes, err := stub.GetState(uRq.UserName)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	u := &def.User{}
+	if err := json.Unmarshal(uAsBytes, u); err != nil {
+		return shim.Error(err.Error())
+	}
+
+	if uRq.PassWord != u.PassWord {
+		return shim.Error("pass word error!")
+	}
+
+	return shim.Success(uAsBytes)
 }

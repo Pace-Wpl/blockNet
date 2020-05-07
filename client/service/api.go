@@ -67,9 +67,9 @@ func InitCar(car *def.CarInit) (string, error) {
 		return "", err
 	}
 
-	log.Println(string(carInfoAsJSON))
-	log.Println(string(carDyAsJSON))
-	log.Println(string(lockJSON))
+	// log.Println(string(carInfoAsJSON))
+	// log.Println(string(carDyAsJSON))
+	// log.Println(string(lockJSON))
 	req := channel.Request{ChaincodeID: ServiceClient.ChaincodeID, Fcn: "initCar", Args: [][]byte{carInfoAsJSON, carDyAsJSON, lockJSON, []byte(eventID)}}
 	_, err = ServiceClient.Client.Execute(req)
 	if err != nil {
@@ -391,6 +391,48 @@ func CarRGL(carNum string) ([]byte, error) {
 
 func getLock(carNum string) ([]byte, error) {
 	req := channel.Request{ChaincodeID: ServiceClient.ChaincodeID, Fcn: "getlock", Args: [][]byte{[]byte(carNum)}}
+	resp, err := ServiceClient.Client.Query(req)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return resp.Payload, nil
+}
+
+func Register(u *def.UserReg) (string, error) {
+	cer, _ := utils.NewUUID()
+	eventID, _ := utils.NewUUID()
+	reg, notifier := regitserEvent(ServiceClient.Client, ServiceClient.ChaincodeID, eventID)
+	defer ServiceClient.Client.UnregisterChaincodeEvent(reg)
+
+	ur := &def.User{ObjectType: "user", UserName: u.UserName, Certificate: cer, PassWord: u.PassWord}
+
+	urJSON, err := json.Marshal(ur)
+	if err != nil {
+		return "", err
+	}
+
+	req := channel.Request{ChaincodeID: ServiceClient.ChaincodeID, Fcn: "register", Args: [][]byte{urJSON, []byte(eventID)}}
+	_, err = ServiceClient.Client.Execute(req)
+	if err != nil {
+		return "", err
+	}
+
+	_, err = eventResult(notifier, eventID)
+	if err != nil {
+		return "", err
+	}
+
+	return cer, nil
+}
+
+func GetUser(u *def.UserReg) ([]byte, error) {
+	urJSON, err := json.Marshal(u)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	req := channel.Request{ChaincodeID: ServiceClient.ChaincodeID, Fcn: "getUser", Args: [][]byte{urJSON}}
 	resp, err := ServiceClient.Client.Query(req)
 	if err != nil {
 		return []byte{}, err

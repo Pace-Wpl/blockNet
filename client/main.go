@@ -35,6 +35,8 @@ func (m middleWare) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func RegisterHandlers() *httprouter.Router {
 	router := httprouter.New()
 
+	router.POST("/cer", GetUser)
+	router.POST("/user", Register)
 	router.POST("/car", InitCar)
 	router.GET("/car/:car_id", GetCar)
 	router.POST("/carDy", PutCarDy)

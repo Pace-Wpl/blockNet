@@ -69,3 +69,9 @@ type CarResp struct {
 type SocketResp struct {
 	Mes string `json:"message"`
 }
+
+//request
+type UserReg struct {
+	UserName string `json:"userName"`
+	PassWord string `json:"passWord"`
+}

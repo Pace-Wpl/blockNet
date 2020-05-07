@@ -147,7 +147,8 @@ func InitCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	resp, err := service.InitCar(ubody)
 	if err != nil {
 		fmt.Printf("servic init error 2:%s\n", err)
-		sendErrorResponse(w, def.ERROR_INTERNAL)
+		sendBadResponse(w, "cer 不存在！")
+		return
 	}
 
 	go task.StartDaemon(ubody.CarNumber)
@@ -183,6 +184,7 @@ func PutCarDy(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	err := service.PutCarDy(ubody)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 
 	sendNormalResponse(w, "successful!")
@@ -203,7 +205,7 @@ func LockCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	resp, err := service.LockCar(lock)
 	if err != nil {
 		fmt.Println(err)
-		sendNormalResponse(w, "")
+		sendBadResponse(w, "Unauthorized")
 		return
 	}
 
@@ -222,10 +224,10 @@ func UnLockCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	lock := &def.LockCar{ObjectType: "carLock", CarNum: ubody.CarNum, Lc: false, Certificate: ubody.Certificate}
 	resp, err := service.UnLockCar(lock)
 	if err != nil {
-		sendNormalResponse(w, "")
+		sendBadResponse(w, "Unauthorized")
 		return
 	}
-	fmt.Println("send normal resp")
+
 	sendNormalResponse(w, resp)
 }
 
@@ -247,6 +249,49 @@ func GetCarHistory(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 	resp, err := service.QueryHistoryForCar(carNum)
 	if err != nil {
 		log.Printf("error:%s\n", err)
+		sendErrorResponse(w, def.ERROR_INTERNAL)
+		return
+	}
+
+	sendNormalResponse(w, string(resp))
+}
+
+//equest body: json UserReg
+func Register(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	res, _ := ioutil.ReadAll(r.Body)
+	ubody := &def.UserReg{}
+
+	if err := json.Unmarshal(res, ubody); err != nil {
+		fmt.Println("request error!")
+		sendErrorResponse(w, "")
+		return
+	}
+
+	cer, err := service.Register(ubody)
+	if err != nil {
+		fmt.Println(err)
+		sendBadResponse(w, "username exit!")
+		return
+	}
+
+	sendNormalResponse(w, "您的注册证书:"+cer)
+}
+
+//equest body: json UserReg
+func GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	res, _ := ioutil.ReadAll(r.Body)
+	ubody := &def.UserReg{}
+
+	if err := json.Unmarshal(res, ubody); err != nil {
+		fmt.Println("request error!")
+		sendErrorResponse(w, def.ERROR_BAD_REQUETS)
+		return
+	}
+
+	resp, err := service.GetUser(ubody)
+	if err != nil {
+		fmt.Println(err)
+		sendBadResponse(w, "password error!")
 		return
 	}
 

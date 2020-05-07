@@ -72,3 +72,15 @@ type OwenrCarItem struct {
 type HistryItem struct {
 	Item []CarHistry `json:"item"`
 }
+
+type User struct {
+	ObjectType  string `json:"objectType"`
+	PassWord    string `json:"passWord"`
+	Certificate string `json:"certificate"`
+	UserName    string `json:"userName"`
+}
+
+type UserReq struct {
+	UserName string `json:"userName"`
+	PassWord string `json:"passWord"`
+}

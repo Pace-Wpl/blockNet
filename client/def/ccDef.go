@@ -113,3 +113,10 @@ type HistryRGL struct {
 type HistryRGLItem struct {
 	Item []HistryRGL `json:"item"`
 }
+
+type User struct {
+	ObjectType  string `json:"objectType"`
+	Certificate string `json:"certificate"`
+	UserName    string `json:"userName"`
+	PassWord    string `json:"passWord"`
+}

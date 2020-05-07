@@ -64,6 +64,10 @@ func (t *BlockCarCC) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.dealRGL(stub, args)
 	case "getHistoryRGL":
 		return t.getHistryRgl(stub, args)
+	case "register":
+		return t.register(stub, args)
+	case "getUser":
+		return t.getUser(stub, args)
 	case "test":
 		return t.testChaincode(stub, args)
 	case "testQ":
