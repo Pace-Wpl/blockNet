@@ -400,7 +400,7 @@ func getLock(carNum string) ([]byte, error) {
 }
 
 func Register(u *def.UserReg) (string, error) {
-	cer, _ := utils.NewUUID()
+	cer := u.UserName
 	eventID, _ := utils.NewUUID()
 	reg, notifier := regitserEvent(ServiceClient.Client, ServiceClient.ChaincodeID, eventID)
 	defer ServiceClient.Client.UnregisterChaincodeEvent(reg)

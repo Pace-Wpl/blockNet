@@ -147,7 +147,7 @@ func InitCar(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	resp, err := service.InitCar(ubody)
 	if err != nil {
 		fmt.Printf("servic init error 2:%s\n", err)
-		sendBadResponse(w, "cer 不存在！")
+		sendBadResponse(w, "user 不存在！")
 		return
 	}
 
@@ -274,11 +274,11 @@ func Register(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		return
 	}
 
-	sendNormalResponse(w, "您的注册证书:"+cer)
+	sendNormalResponse(w, "注册成功:"+cer)
 }
 
 //equest body: json UserReg
-func GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func Login(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	res, _ := ioutil.ReadAll(r.Body)
 	ubody := &def.UserReg{}
 
@@ -288,14 +288,14 @@ func GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		return
 	}
 
-	resp, err := service.GetUser(ubody)
+	_, err := service.GetUser(ubody)
 	if err != nil {
 		fmt.Println(err)
 		sendBadResponse(w, "password error!")
 		return
 	}
 
-	sendNormalResponse(w, string(resp))
+	sendNormalResponse(w, "欢迎您:"+ubody.UserName)
 }
 
 func TaskOpen(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
