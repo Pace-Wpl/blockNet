@@ -52,6 +52,9 @@ func RegisterHandlers() *httprouter.Router {
 	router.GET("/task/:car_num", TaskOpen)
 	router.GET("/lms", Lms)
 
+	router.GET("/test/:key", TestChaincode)
+	router.GET("/testQ/:key", TestChaincodQ)
+
 	return router
 }
 

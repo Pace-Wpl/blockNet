@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
+	"strconv"
 
 	"github.com/blockNet/client/def"
 	"github.com/blockNet/client/service"
@@ -113,10 +115,12 @@ func PutRoad(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 }
 
 func TestChaincode(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	k := p.ByName("key")
-	fmt.Println(k)
+	flag := rand.Intn(99999)
+	sf := strconv.Itoa(flag)
+	k := p.ByName("key") + sf
 	if err := service.TestChaincod(k); err != nil {
 		fmt.Println(err.Error())
+		sendErrorResponse(w, "error")
 		return
 	}
 
@@ -124,9 +128,9 @@ func TestChaincode(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 
 func TestChaincodQ(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	k := p.ByName("key")
-	fmt.Println(k)
 	if err := service.TestChaincodQ(k); err != nil {
 		fmt.Println(err.Error())
+		sendErrorResponse(w, "error")
 		return
 	}
 }
@@ -291,7 +295,7 @@ func Login(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	_, err := service.GetUser(ubody)
 	if err != nil {
 		fmt.Println(err)
-		sendBadResponse(w, "password error!")
+		sendBadResponse(w, "user not exit or password error!")
 		return
 	}
 
